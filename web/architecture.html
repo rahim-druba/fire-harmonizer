@@ -1,0 +1,282 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Fire Harmonizer Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* layout: a header brief, then two stacked block diagrams (pipeline, then request flow), then a build-ownership legend and a data-source footer */
+:root{
+  --bg:#f6f3ec;
+  --surface:#ffffff;
+  --surface-2:#eee8db;
+  --fg:#211d16;
+  --muted:#6f6657;
+  --border:#ddd3bf;
+  --claude:#d9541f;
+  --codex:#1f7a6c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15130f;
+    --surface:#1d1a15;
+    --surface-2:#262117;
+    --fg:#f1ece0;
+    --muted:#a69c87;
+    --border:#39311f;
+    --claude:#ff7a45;
+    --codex:#4fd1c5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15130f;
+  --surface:#1d1a15;
+  --surface-2:#262117;
+  --fg:#f1ece0;
+  --muted:#a69c87;
+  --border:#39311f;
+  --claude:#ff7a45;
+  --codex:#4fd1c5;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body{
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Inter", system-ui, sans-serif;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 56px;
+}
+.wrap{ max-width: 980px; margin: 0 auto; }
+
+.eyebrow{
+  font: 600 11px/1 "IBM Plex Mono", monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+h1{
+  font: 600 clamp(26px,4vw,38px)/1.1 "Space Grotesk", sans-serif;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+.lede{
+  font: 400 15px/1.55 "Inter", sans-serif;
+  color: var(--muted);
+  max-width: 62ch;
+  margin: 0 0 36px;
+}
+
+h2{
+  font: 600 18px/1.3 "Space Grotesk", sans-serif;
+  margin: 0 0 4px;
+}
+.section-note{
+  font: 400 13px/1.5 "Inter", sans-serif;
+  color: var(--muted);
+  margin: 0 0 16px;
+  max-width: 68ch;
+}
+
+figure{ margin: 0 0 44px; }
+.diagram-frame{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  overflow-x: auto;
+}
+svg{ display:block; width: 100%; height: auto; min-width: 640px; }
+figcaption{
+  font: 400 12.5px/1.5 "Inter", sans-serif;
+  color: var(--muted);
+  margin-top: 10px;
+  max-width: 68ch;
+}
+
+text{ fill: var(--fg); font-family: "Inter", sans-serif; }
+.mono{ font-family: "IBM Plex Mono", monospace; }
+.muted-text{ fill: var(--muted); }
+.box{ fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+.box-dashed{ fill: none; stroke: var(--border); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.line{ fill:none; stroke: var(--muted); stroke-width: 1.6; }
+.divider{ stroke: var(--border); stroke-width: 1; }
+
+.legend{
+  display:flex; flex-wrap:wrap; gap: 20px;
+  margin: 18px 0 44px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.legend-item{ display:flex; align-items:center; gap: 9px; font-size: 13px; min-width: 0; }
+.swatch{ width: 14px; height: 14px; border-radius: 4px; flex: none; }
+
+.footer-note{
+  font: 400 12.5px/1.6 "Inter", sans-serif;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+.footer-note strong{ color: var(--fg); font-weight: 600; }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Architecture brief — NASA Space Apps 2026</p>
+  <h1>Fire Harmonizer: how it actually works</h1>
+  <p class="lede">Two block diagrams: how a raw satellite detection becomes a plain-language anomaly alert, and which component talks to which when a user asks for one region and date range. Built on real NASA FIRMS data (MODIS + VIIRS), demoed against the Sept 2026 Kazakhstan steppe fires.</p>
+
+  <section>
+    <h2>1. Data &amp; processing pipeline</h2>
+    <p class="section-note">What happens to a satellite detection between the satellite and the screen. Five hops, each one a real transformation — this is the order judges will ask about if they ask "how is it actually harmonized."</p>
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 1040 250" role="img" aria-label="Pipeline diagram: MODIS and VIIRS feed NASA FIRMS API, which feeds the Harmonization Layer, which feeds the Baseline and Anomaly Engine, which feeds the Claude Narrative Layer, which feeds the Map and Calendar UI.">
+          <defs>
+            <marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+            </marker>
+          </defs>
+
+          <!-- arrows -->
+          <g class="line">
+            <line x1="165" y1="125" x2="193" y2="125" marker-end="url(#arrow1)"/>
+            <line x1="335" y1="125" x2="363" y2="125" marker-end="url(#arrow1)"/>
+            <line x1="505" y1="125" x2="533" y2="125" marker-end="url(#arrow1)"/>
+            <line x1="675" y1="125" x2="703" y2="125" marker-end="url(#arrow1)"/>
+            <line x1="845" y1="125" x2="873" y2="125" marker-end="url(#arrow1)"/>
+          </g>
+
+          <!-- arrow labels -->
+          <g class="mono muted-text" font-size="10" text-anchor="middle">
+            <text x="179" y="72">two raw feeds</text>
+            <text x="349" y="72">hotspot records</text>
+            <text x="519" y="72">normalized grid</text>
+            <text x="689" y="72">flagged anomaly</text>
+            <text x="859" y="72">plain-language text</text>
+          </g>
+
+          <!-- box 0: satellites -->
+          <rect x="6" y="90" width="4" height="70" fill="var(--muted)"/>
+          <rect class="box" x="25" y="90" width="140" height="70" rx="10"/>
+          <line class="divider" x1="25" y1="125" x2="165" y2="125"/>
+          <text x="95" y="113" text-anchor="middle" font-weight="600" font-size="13">MODIS</text>
+          <text x="95" y="146" text-anchor="middle" font-weight="600" font-size="13">VIIRS</text>
+
+          <!-- box 1: FIRMS API -->
+          <rect class="box" x="195" y="90" width="140" height="70" rx="10"/>
+          <text x="265" y="118" text-anchor="middle" font-weight="600" font-size="12.5">NASA FIRMS</text>
+          <text x="265" y="135" text-anchor="middle" font-weight="600" font-size="12.5">API</text>
+          <text class="muted-text" x="265" y="150" text-anchor="middle" font-size="8.5">live hotspot feed</text>
+
+          <!-- box 2: Harmonization Layer (Codex) -->
+          <rect x="365" y="90" width="4" height="70" fill="var(--codex)"/>
+          <rect class="box" x="365" y="90" width="140" height="70" rx="10"/>
+          <text x="439" y="118" text-anchor="middle" font-weight="600" font-size="12.5">Harmonization</text>
+          <text x="439" y="135" text-anchor="middle" font-weight="600" font-size="12.5">Layer</text>
+          <text class="muted-text" x="439" y="150" text-anchor="middle" font-size="8.5">common grid + time basis</text>
+
+          <!-- box 3: Baseline + Anomaly Engine (Codex) -->
+          <rect x="535" y="90" width="4" height="70" fill="var(--codex)"/>
+          <rect class="box" x="535" y="90" width="140" height="70" rx="10"/>
+          <text x="609" y="113" text-anchor="middle" font-weight="600" font-size="12">Baseline +</text>
+          <text x="609" y="130" text-anchor="middle" font-weight="600" font-size="12">Anomaly Engine</text>
+          <text class="muted-text" x="609" y="148" text-anchor="middle" font-size="8.5">z-score vs 10yr season</text>
+
+          <!-- box 4: Claude Narrative Layer -->
+          <rect x="705" y="90" width="4" height="70" fill="var(--claude)"/>
+          <rect class="box" x="705" y="90" width="140" height="70" rx="10"/>
+          <text x="779" y="118" text-anchor="middle" font-weight="600" font-size="12.5">Claude Narrative</text>
+          <text x="779" y="135" text-anchor="middle" font-weight="600" font-size="12.5">Layer</text>
+          <text class="muted-text" x="779" y="150" text-anchor="middle" font-size="8.5">stats → plain language</text>
+
+          <!-- box 5: Map + Calendar UI -->
+          <rect x="875" y="90" width="4" height="70" fill="var(--muted)"/>
+          <rect class="box" x="875" y="90" width="140" height="70" rx="10"/>
+          <text x="949" y="118" text-anchor="middle" font-weight="600" font-size="12.5">Map + Calendar</text>
+          <text x="949" y="135" text-anchor="middle" font-weight="600" font-size="12.5">UI</text>
+          <text class="muted-text" x="949" y="150" text-anchor="middle" font-size="8.5">what the judge sees</text>
+        </svg>
+      </div>
+      <figcaption>Raw MODIS and VIIRS detections merge through NASA's FIRMS API, get put on one common grid, get scored against a seasonal baseline, get explained in words by Claude, then get drawn on the map.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>2. Request flow — who talks to whom</h2>
+    <p class="section-note">One user action — pick a region and a date range — and the four network hops it triggers. The harmonization and z-score math happen inside the backend process, not over the network, which is why they're a label, not an arrow.</p>
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 1040 450" role="img" aria-label="Request flow diagram: the browser client sends a region and date range to the backend API server, which fetches detections from NASA FIRMS and sends anomaly stats to the Anthropic Claude API, then returns hotspots, anomaly score, and narrative back to the client.">
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" fill="var(--muted)"/>
+            </marker>
+          </defs>
+
+          <!-- client row -->
+          <rect class="box-dashed" x="20" y="20" width="1000" height="115" rx="12"/>
+          <text class="mono muted-text" x="35" y="38" font-size="10" letter-spacing="1">CLIENT — BROWSER</text>
+          <rect class="box" x="35" y="50" width="290" height="72" rx="10"/>
+          <text x="180" y="80" text-anchor="middle" font-weight="600" font-size="12.5">Leaflet Map</text>
+          <text class="muted-text" x="180" y="98" text-anchor="middle" font-size="9.5">(region picker)</text>
+          <rect class="box" x="365" y="50" width="290" height="72" rx="10"/>
+          <text x="510" y="80" text-anchor="middle" font-weight="600" font-size="12.5">Calendar Picker</text>
+          <text class="muted-text" x="510" y="98" text-anchor="middle" font-size="9.5">(date range)</text>
+          <rect class="box" x="695" y="50" width="290" height="72" rx="10"/>
+          <text x="840" y="80" text-anchor="middle" font-weight="600" font-size="12.5">Anomaly + Narrative</text>
+          <text class="muted-text" x="840" y="98" text-anchor="middle" font-size="9.5">Panel</text>
+
+          <!-- backend row -->
+          <rect class="box" x="35" y="185" width="950" height="100" rx="10"/>
+          <text x="510" y="210" text-anchor="middle" font-weight="600" font-size="13">API Server — Node + Express</text>
+          <g class="mono" font-size="10.5" text-anchor="middle">
+            <text x="195" y="240">/api/hotspots</text>
+            <text x="510" y="240">/api/anomaly</text>
+            <text x="825" y="240">/api/brief</text>
+          </g>
+          <text class="muted-text" x="510" y="268" text-anchor="middle" font-size="9.5" font-style="italic">internal: harmonizes MODIS+VIIRS grid/time → seasonal z-score (no network hop)</text>
+
+          <!-- external row -->
+          <rect class="box" x="150" y="345" width="330" height="80" rx="10"/>
+          <text x="315" y="378" text-anchor="middle" font-weight="600" font-size="13">NASA FIRMS API</text>
+          <text class="muted-text" x="315" y="398" text-anchor="middle" font-size="9.5">MODIS + VIIRS hotspot feed</text>
+          <rect class="box" x="560" y="345" width="330" height="80" rx="10"/>
+          <text x="725" y="378" text-anchor="middle" font-weight="600" font-size="13">Anthropic Claude API</text>
+          <text class="muted-text" x="725" y="398" text-anchor="middle" font-size="9.5">anomaly → plain-language narrative</text>
+
+          <!-- client <-> backend arrows -->
+          <line class="line" x1="460" y1="122" x2="460" y2="183" marker-end="url(#arrow2)"/>
+          <line class="line" x1="560" y1="183" x2="560" y2="122" marker-end="url(#arrow2)"/>
+          <text class="mono muted-text" x="440" y="155" text-anchor="end" font-size="10">1 · region + date range</text>
+          <text class="mono muted-text" x="580" y="155" text-anchor="start" font-size="10">4 · hotspots + anomaly + narrative</text>
+
+          <!-- backend <-> FIRMS arrows -->
+          <line class="line" x1="300" y1="283" x2="300" y2="343" marker-end="url(#arrow2)"/>
+          <line class="line" x1="314" y1="343" x2="314" y2="283" marker-end="url(#arrow2)"/>
+          <text class="mono muted-text" x="330" y="318" text-anchor="start" font-size="10">2 · fetch ⇄ raw records</text>
+
+          <!-- backend <-> Claude arrows -->
+          <line class="line" x1="720" y1="283" x2="720" y2="343" marker-end="url(#arrow2)"/>
+          <line class="line" x1="734" y1="343" x2="734" y2="283" marker-end="url(#arrow2)"/>
+          <text class="mono muted-text" x="750" y="318" text-anchor="start" font-size="10">3 · stats ⇄ narrative</text>
+        </svg>
+      </div>
+      <figcaption>The browser never calls NASA or Claude directly — everything routes through our own Express server, which is the only place that holds API keys.</figcaption>
+    </figure>
+  </section>
+
+  <div class="legend">
+    <div class="legend-item"><span class="swatch" style="background:var(--codex)"></span>Codex builds: harmonization + anomaly math, backend endpoints</div>
+    <div class="legend-item"><span class="swatch" style="background:var(--claude)"></span>Claude builds: narrative layer, app scaffolding</div>
+    <div class="legend-item"><span class="swatch" style="background:var(--muted)"></span>Shared / external: data sources, UI shell</div>
+  </div>
+
+  <p class="footer-note">Data source: <strong>NASA FIRMS</strong> (Fire Information for Resource Management System), which already serves both MODIS and VIIRS active-fire detections — our harmonization layer is the normalization step on top of that, not a new sensor calibration. Local validation case: the September 2026 Kazakhstan steppe and forest fires (~2,870 ha).</p>
+
+</div>
