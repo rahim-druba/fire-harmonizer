@@ -83,8 +83,10 @@ Full diagrams (data pipeline + request flow, with network hops numbered) are in 
 │   └── requirements.txt
 ├── data/
 │   └── firms_kazakhstan_sept2026.csv  # Real daily MODIS/VIIRS counts pulled from NASA FIRMS
-├── server.js                   # Express scaffold (Claude API kept server-side)
-├── public/index.html           # Earlier challenge direction (Mars landing-site map), kept for reference
+├── server.js                   # Express server: /api/brief (Claude), /api/hotspots (live FIRMS proxy)
+├── public/index.html           # Local tools landing page
+├── public/region-picker.html   # Real-time Leaflet region picker, live FIRMS lookups
+├── public/mars-legacy.html     # Earlier challenge direction (Mars landing-site map) -- unrelated, kept for reference
 ├── RESEARCH.md                 # Literature review on MODIS/VIIRS harmonization, fully cited
 ├── NOTES.md / CHEATSHEET.md    # Event logistics, pitch, mentor prep
 └── NASA Space Apps Challenge.pdf

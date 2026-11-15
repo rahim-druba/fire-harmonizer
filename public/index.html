@@ -3,102 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Interplanetary Survival Guide: Martian Map</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<title>Fire Harmonizer — Local Tools</title>
 <style>
   html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: #0b0b10; color: #eee; }
-  #map { position: absolute; top: 0; left: 0; right: 340px; bottom: 0; }
-  #panel {
-    position: absolute; top: 0; right: 0; width: 340px; height: 100%;
-    background: #14141c; box-sizing: border-box; padding: 16px; overflow-y: auto;
-    border-left: 1px solid #2a2a36;
-  }
-  #panel h1 { font-size: 16px; margin: 0 0 4px; }
-  #panel .sub { color: #9a9ab0; font-size: 12px; margin-bottom: 16px; }
-  #brief { background: #1d1d29; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.5; min-height: 80px; white-space: pre-wrap; }
-  #brief.loading { color: #9a9ab0; font-style: italic; }
-  .site-btn { display: block; width: 100%; text-align: left; background: #1d1d29; border: 1px solid #2a2a36; color: #eee;
-    padding: 8px 10px; margin-bottom: 6px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  .site-btn:hover { background: #262636; }
-  .leaflet-control-layers { background: #1d1d29 !important; color: #eee; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  .sub { color: #9a9ab0; font-size: 13px; margin-bottom: 28px; }
+  a.card { display: block; background: #14141c; border: 1px solid #2a2a36; border-radius: 10px;
+    padding: 16px 18px; margin-bottom: 12px; color: #eee; text-decoration: none; }
+  a.card:hover { background: #1a1a26; }
+  a.card .name { font-weight: 600; font-size: 14px; }
+  a.card .desc { color: #9a9ab0; font-size: 12.5px; margin-top: 4px; }
+  .legacy { margin-top: 32px; padding-top: 16px; border-top: 1px solid #2a2a36; }
+  .legacy .label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #6f6f80; margin-bottom: 8px; }
 </style>
 </head>
 <body>
-<div id="map"></div>
-<div id="panel">
-  <h1>Interplanetary Survival Guide</h1>
-  <div class="sub">Click a landing site for an AI-generated mission brief</div>
-  <div id="sites"></div>
-  <div id="brief">Select a site to generate a mission brief.</div>
+<div class="wrap">
+  <h1>Fire Harmonizer — Local Tools</h1>
+  <div class="sub">NASA Space Apps 2026. The live demo is the claude.ai artifact; these are the real backend-connected pieces that only run locally.</div>
+
+  <a class="card" href="/region-picker.html">
+    <div class="name">Region Picker</div>
+    <div class="desc">Draw a region on a real Leaflet map, pick a date, get live NASA FIRMS MODIS + VIIRS counts for it.</div>
+  </a>
+
+  <div class="legacy">
+    <div class="label">Earlier challenge direction, kept for reference</div>
+    <a class="card" href="/mars-legacy.html">
+      <div class="name">Interplanetary Survival Guide (Mars)</div>
+      <div class="desc">Not related to the Fire Harmonizer project — an earlier challenge option that wasn't pursued.</div>
+    </a>
+  </div>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-<script>
-// shortcut: landing-site coords are widely-cited approximations, not surveyed datum values — re-check against the official mission press kit before presenting to judges.
-const SITES = [
-  { name: 'Perseverance (Jezero Crater)', lat: 18.4447, lon: 77.4508, note: 'Ancient river delta, astrobiology target' },
-  { name: 'Curiosity (Gale Crater)', lat: -4.5895, lon: 137.4417, note: 'Layered sedimentary mound, Mount Sharp' },
-  { name: 'InSight (Elysium Planitia)', lat: 4.5024, lon: 135.9185, note: 'Flat plain, seismometer + weather station' },
-  { name: 'Viking 1 (Chryse Planitia)', lat: 22.48, lon: -49.97, note: 'First successful Mars surface mission, 1976' },
-  { name: 'Viking 2 (Utopia Planitia)', lat: 47.64, lon: 134.29, note: 'Northern plains, frost observed' },
-  { name: 'Opportunity (Meridiani Planum)', lat: -1.9462, lon: -5.5266, note: 'Hematite-rich plain' },
-  { name: 'Spirit (Gusev Crater)', lat: -14.5684, lon: 175.4726, note: 'Ancient crater, volcanic plain' }
-];
-
-// Mars Trek global mosaics use equirectangular (plate carree) tiling, same 2:1
-// scheme Leaflet's built-in EPSG4326 CRS expects — this is the standard trick
-// for serving planetary WMTS tiles in Leaflet without a projection plugin.
-const map = L.map('map', { crs: L.CRS.EPSG4326, minZoom: 1, maxZoom: 9 }).setView([0, 0], 2);
-
-function marsLayer(product) {
-  return L.tileLayer(
-    `https://trek.nasa.gov/tiles/Mars/EQ/${product}/1.0.0/default/default028mm/{z}/{y}/{x}.jpg`,
-    { maxNativeZoom: 7, attribution: 'NASA/JPL Mars Trek' }
-  );
-}
-
-const visual = marsLayer('Mars_Viking_MDIM21_ClrMosaic_global_232m').addTo(map);
-const elevation = marsLayer('Mars_MGS_MOLA_ClrShade_merge_global_463m');
-
-L.control.layers({ 'Viking visual mosaic': visual, 'MOLA color elevation': elevation }).addTo(map);
-
-const sitesEl = document.getElementById('sites');
-const briefEl = document.getElementById('brief');
-
-SITES.forEach(site => {
-  L.marker([site.lat, site.lon]).addTo(map).bindPopup(`<b>${site.name}</b><br>${site.note}`);
-
-  const btn = document.createElement('button');
-  btn.className = 'site-btn';
-  btn.textContent = site.name;
-  btn.onclick = () => selectSite(site);
-  sitesEl.appendChild(btn);
-});
-
-async function selectSite(site) {
-  map.setView([site.lat, site.lon], 5);
-  briefEl.textContent = 'Generating mission brief…';
-  briefEl.classList.add('loading');
-  try {
-    const res = await fetch('/api/brief', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        siteName: site.name,
-        lat: site.lat,
-        lon: site.lon,
-        elevationNote: site.note,
-        weather: 'See NASA InSight Weather API (api.nasa.gov/insight_weather) for historical Elysium Planitia sol data as regional reference.'
-      })
-    });
-    const data = await res.json();
-    briefEl.classList.remove('loading');
-    briefEl.textContent = data.brief || data.error || 'No brief returned.';
-  } catch (e) {
-    briefEl.classList.remove('loading');
-    briefEl.textContent = 'Request failed: ' + e.message;
-  }
-}
-</script>
 </body>
 </html>
