@@ -10,6 +10,7 @@ One file with everything: links, pitch, architecture, mentor prep. Everything be
 - **Hackathon Offer Tracker** — tracks the 5 sponsor free offers (GoDaddy, Google Cloud, Meteomatics, Microsoft, Miro) so none of them silently starts charging a card: https://claude.ai/artifact/YPLxfk9jdF28rgAJF7m1gF
 - **Fire Harmonizer Architecture** — two block diagrams: data pipeline (satellite → narrative) and request flow (who talks to whom): https://claude.ai/artifact/GTXE5hpJBJT8VVf31PXvD4
 - **Fire Harmonizer Prototype** — the visual demo: calendar colored by anomaly severity, MODIS-vs-VIIRS gap chart, 30-day trend, Claude narrative per day: https://claude.ai/artifact/4mLbtg7VCFqEqd3JJ58EED
+- **Fire Harmonizer Design System** (private, internal reference) — tokens, type scale, and two formalized components extracted from both artifacts above, so future edits stay consistent: https://claude.ai/artifact/75sVX9HqnrqCg5B534ASYH
 
 The two Fire Harmonizer links are now **shared publicly** ("anyone with the link"). The Challenge Matrix and Offer Tracker stay private — internal planning docs, not for a general audience.
 
