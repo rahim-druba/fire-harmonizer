@@ -18,7 +18,7 @@
   #panel .sub { color: #9a9ab0; font-size: 12px; margin-bottom: 16px; }
   #bbox { background: #1d1d29; border-radius: 8px; padding: 10px 12px; font: 12px/1.5 ui-monospace, monospace; margin-bottom: 12px; word-break: break-all; }
   label { display: block; font-size: 12px; color: #9a9ab0; margin: 12px 0 4px; }
-  input[type="date"] { width: 100%; box-sizing: border-box; background: #1d1d29; border: 1px solid #2a2a36; color: #eee; padding: 6px 8px; border-radius: 6px; }
+  input[type="date"], select { width: 100%; box-sizing: border-box; background: #1d1d29; border: 1px solid #2a2a36; color: #eee; padding: 6px 8px; border-radius: 6px; font: inherit; }
   button { width: 100%; background: #e0652e; border: none; color: #fff; padding: 10px; border-radius: 6px;
     font-weight: 600; cursor: pointer; margin-top: 12px; }
   button:disabled { opacity: .5; cursor: default; }
@@ -38,8 +38,17 @@
 
   <div id="bbox">No region selected yet. Use the rectangle tool (top-left of the map) to draw one.</div>
 
-  <label for="dateInput">Date</label>
+  <label for="dateInput">Start date</label>
   <input type="date" id="dateInput" value="2026-09-07" min="2000-11-01" max="2026-11-15">
+
+  <label for="rangeInput">Date range (days)</label>
+  <select id="rangeInput">
+    <option value="1">1 day (just the start date)</option>
+    <option value="2">2 days</option>
+    <option value="3">3 days</option>
+    <option value="4">4 days</option>
+    <option value="5">5 days (NASA FIRMS' max per request)</option>
+  </select>
 
   <button id="lookupBtn" disabled>Get real-time hotspot count</button>
   <button class="secondary" id="presetBtn">Use the Kazakhstan demo region</button>
@@ -76,6 +85,7 @@ const bboxEl = document.getElementById('bbox');
 const lookupBtn = document.getElementById('lookupBtn');
 const resultEl = document.getElementById('result');
 const dateInput = document.getElementById('dateInput');
+const rangeInput = document.getElementById('rangeInput');
 let currentBbox = null;
 
 function setBboxFromLayer(layer) {
@@ -112,14 +122,18 @@ lookupBtn.addEventListener('click', async function () {
   resultEl.classList.add('loading');
   lookupBtn.disabled = true;
   try {
-    const url = '/api/hotspots?bbox=' + encodeURIComponent(currentBbox) + '&date=' + encodeURIComponent(dateInput.value);
+    const url = '/api/hotspots?bbox=' + encodeURIComponent(currentBbox)
+      + '&date=' + encodeURIComponent(dateInput.value)
+      + '&dayRange=' + encodeURIComponent(rangeInput.value);
     const res = await fetch(url);
     const data = await res.json();
     resultEl.classList.remove('loading');
     if (!res.ok) {
       resultEl.textContent = 'Error: ' + (data.error || res.status);
     } else {
+      var rangeLabel = data.dayRange > 1 ? (data.dayRange + ' days from ' + data.date) : data.date;
       resultEl.innerHTML =
+        '<div class="row"><span style="color:#9a9ab0">' + rangeLabel + '</span></div>' +
         '<div class="row"><span>MODIS</span><b>' + data.modis + '</b></div>' +
         '<div class="row"><span>VIIRS (NOAA-20)</span><b>' + data.viirs + '</b></div>' +
         '<div class="row"><span>Combined</span><b>' + data.combined + '</b></div>';

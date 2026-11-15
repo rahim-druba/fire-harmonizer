@@ -38,9 +38,9 @@ Cover exactly three things: (1) terrain hazard level and why, (2) one specific n
 const BBOX_RE = /^-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-async function firmsCount(source, bbox, date) {
+async function firmsCount(source, bbox, date, dayRange) {
   const key = process.env.FIRMS_MAP_KEY;
-  const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${key}/${source}/${bbox}/1/${date}`;
+  const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${key}/${source}/${bbox}/${dayRange}/${date}`;
   const res = await fetch(url);
   const text = await res.text();
   if (!res.ok || /invalid|error/i.test(text.split('\n')[0])) {
@@ -52,21 +52,26 @@ async function firmsCount(source, bbox, date) {
 
 app.get('/api/hotspots', async (req, res) => {
   const { bbox, date } = req.query;
+  // FIRMS' area/csv endpoint caps day_range at 5; dayRange=1 is a single day, 5 covers date..date+4.
+  const dayRange = Number.isInteger(+req.query.dayRange) ? +req.query.dayRange : 1;
   if (typeof bbox !== 'string' || !BBOX_RE.test(bbox)) {
     return res.status(400).json({ error: 'bbox must be "west,south,east,north" in decimal degrees' });
   }
   if (typeof date !== 'string' || !DATE_RE.test(date)) {
     return res.status(400).json({ error: 'date must be YYYY-MM-DD' });
   }
+  if (dayRange < 1 || dayRange > 5) {
+    return res.status(400).json({ error: 'dayRange must be between 1 and 5 (a NASA FIRMS limit)' });
+  }
   if (!process.env.FIRMS_MAP_KEY) {
     return res.status(500).json({ error: 'FIRMS_MAP_KEY not configured on the server' });
   }
   try {
     const [modis, viirs] = await Promise.all([
-      firmsCount('MODIS_NRT', bbox, date),
-      firmsCount('VIIRS_NOAA20_NRT', bbox, date)
+      firmsCount('MODIS_NRT', bbox, date, dayRange),
+      firmsCount('VIIRS_NOAA20_NRT', bbox, date, dayRange)
     ]);
-    res.json({ bbox, date, modis, viirs, combined: modis + viirs });
+    res.json({ bbox, date, dayRange, modis, viirs, combined: modis + viirs });
   } catch (err) {
     console.error(err);
     res.status(502).json({ error: 'FIRMS lookup failed: ' + err.message });

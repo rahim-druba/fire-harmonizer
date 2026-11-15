@@ -83,6 +83,7 @@ h1{ font:600 clamp(24px,4vw,34px)/1.15 "Space Grotesk",sans-serif; margin:0 0 8p
   background:var(--surface-2); color:var(--muted); padding:0;
 }
 .cal-cell.empty{ visibility:hidden; cursor:default; }
+.cal-cell.no-data{ background:var(--surface); color:var(--border); cursor:default; }
 .cal-cell[data-tier="good"]{ background:var(--status-good); color:var(--ink-on-fill); }
 .cal-cell[data-tier="warning"]{ background:var(--status-warning); color:var(--ink-on-warning); }
 .cal-cell[data-tier="serious"]{ background:var(--status-serious); color:var(--ink-on-fill); }
@@ -172,12 +173,17 @@ svg.chart{ width:100%; height:auto; display:block; }
 <div class="wrap">
   <p class="eyebrow">Harmonization of MODIS &amp; VIIRS Hot Spots — NASA Space Apps 2026</p>
   <h1>See the gap, day by day</h1>
-  <p class="lede">MODIS and VIIRS almost never agree on how much fire is burning. Pick a day on the calendar — it's colored by how anomalous that day was — and the panel on the right shows exactly where the two satellites diverge, how far today is from a normal September, and a plain-language read of what that means.</p>
-  <div class="badge-sample"><span class="tag">What's actually real here</span>Every MODIS/VIIRS detection count below is real — pulled live from NASA FIRMS (MODIS NRT + VIIRS NOAA-20 NRT) with a personal API key, September 2026, Kazakhstan bounding box. Satellite images (6 dates) are real, live-fetched NASA GIBS imagery. The ML anomaly score is a real Isolation Forest model (scikit-learn) run against this data — code in <code>ml/anomaly_model.py</code>. The narrative can be regenerated live by the real Claude API.</div>
+  <p class="lede">MODIS and VIIRS almost never agree on how much fire is burning. Browse Sept 1 - Nov 14, 2026 — each day is colored by how anomalous it was — and the panel on the right shows exactly where the two satellites diverge, how far that day is from typical, and a plain-language read of what that means.</p>
+  <div class="badge-sample"><span class="tag">What's actually real here</span>Every MODIS/VIIRS detection count below is real — pulled live from NASA FIRMS (MODIS NRT + VIIRS NOAA-20 NRT) with a personal API key, Sept 1 - Nov 14 2026 (75 real days, the NRT retention window), Kazakhstan bounding box. Satellite images (6 dates) are real, live-fetched NASA GIBS imagery. The ML anomaly score is a real Isolation Forest model (scikit-learn) run against this data — code in <code>ml/anomaly_model.py</code>. The narrative can be regenerated live by the real Claude API.</div>
 
   <div class="grid">
     <div class="panel">
-      <div class="cal-head"><span class="month" id="monthLabel">September 2026</span><span class="sub" style="margin:0;">Almaty region, KZ</span></div>
+      <div class="cal-head">
+        <button class="btn" id="prevMonthBtn" type="button" style="padding:4px 10px;">&larr;</button>
+        <span class="month" id="monthLabel">September 2026</span>
+        <button class="btn" id="nextMonthBtn" type="button" style="padding:4px 10px;">&rarr;</button>
+      </div>
+      <div class="sub" style="margin:-4px 0 10px;">Almaty region, KZ &middot; Sep 1 &ndash; Nov 14, 2026 (75 real days)</div>
       <div class="weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
       <div class="cal-grid" id="calGrid"></div>
       <div class="legend">
@@ -214,7 +220,7 @@ svg.chart{ width:100%; height:auto; display:block; }
         </div>
         <div class="chart-box">
           <h3>30-day detection trend</h3>
-          <p class="chart-sub">Combined detections, dashed line = this month's median day (753). Selected day marked.</p>
+          <p class="chart-sub">All 75 real days, Sept 1 - Nov 14. Dashed line = the median day (662) across that whole window. Thin verticals mark month boundaries.</p>
           <svg class="chart" id="trendChart" viewBox="0 0 420 170"></svg>
         </div>
       </div>
@@ -228,7 +234,7 @@ svg.chart{ width:100%; height:auto; display:block; }
 
       <div class="btn-row">
         <button class="btn" id="askClaudeBtn" type="button">Ask Claude live</button>
-        <button class="btn" id="csvBtn" type="button">Download month as CSV</button>
+        <button class="btn" id="csvBtn" type="button">Download CSV (Sept-Nov)</button>
       </div>
 
       <div class="narrative">
@@ -238,7 +244,7 @@ svg.chart{ width:100%; height:auto; display:block; }
     </div>
   </div>
 
-  <p class="footer-note"><strong>Data:</strong> NASA FIRMS, live API, MODIS NRT (since 2000) + VIIRS NOAA-20 NRT (not the retired Suomi NPP feed — Suomi NPP stopped delivering data Nov 2, 2026) active-fire detections, September 2026, over a bounding box covering all of Kazakhstan. <strong>The gap:</strong> VIIRS's finer ~375m resolution reliably detects more, smaller fires than MODIS's ~1km resolution — on the real peak day (Sep 7) that's 656 MODIS detections vs. 2,647 VIIRS, the same country, the same week. <strong>Baseline:</strong> this month's own median daily total (753), used as an honest proxy — a true multi-year seasonal climatology needs a multi-year FIRMS pull we didn't have time for. <strong>Scope note:</strong> this is the whole country's fire signal for the month (wildfires and agricultural burning together), not just the one reported steppe-fire event — Sept 6-8 is the real spike in the actual satellite record. <strong>ML cross-check:</strong> an Isolation Forest (scikit-learn) run on this same real data independently flags the same Sept 6-8 window as anomalous — 93.3% agreement with the rule-based tier, 100% recall on the severe days. No accuracy score against "ground truth" is reported, because none exists for this task (it's unsupervised) — this is agreement between two independent methods, not validation against a known answer. Run it yourself from <code>ml/anomaly_model.py</code> in the repo.</p>
+  <p class="footer-note"><strong>Data:</strong> NASA FIRMS, live API, MODIS NRT (since 2000) + VIIRS NOAA-20 NRT (not the retired Suomi NPP feed — Suomi NPP stopped delivering data Nov 2, 2026) active-fire detections, Sept 1 - Nov 14, 2026 — 75 real days, the full NRT retention window this key has access to — over a bounding box covering all of Kazakhstan. <strong>The gap:</strong> VIIRS's finer ~375m resolution reliably detects more, smaller fires than MODIS's ~1km resolution — on the real peak day (Sep 7) that's 656 MODIS detections vs. 2,647 VIIRS, the same country, the same week. <strong>Baseline:</strong> the median daily total across all 75 real days (662), used as an honest proxy — a true multi-year seasonal climatology needs a multi-year FIRMS pull beyond this key's NRT window. <strong>Scope note:</strong> this is the whole country's fire signal day by day (wildfires and agricultural burning together), not just the one reported steppe-fire event — Sept 6-8 is the real spike in the actual satellite record, and the declining trend into November is real seasonal cooling, not a data gap. <strong>ML cross-check:</strong> an Isolation Forest (scikit-learn) run on this same real 75-day data independently flags the same Sept 6-8 window as anomalous — 86.7% agreement with the rule-based tier across all 75 days, 58.3% recall and precision on the severe days specifically (down from a smaller, easier 30-day test — a bigger, more honest dataset is a harder test, and this is the real number, not the flattering one). No accuracy score against "ground truth" is reported, because none exists for this task (it's unsupervised) — this is agreement between two independent methods, not validation against a known answer. Run it yourself from <code>ml/anomaly_model.py</code> in the repo.</p>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -247,41 +253,65 @@ svg.chart{ width:100%; height:auto; display:block; }
 (function(){
   "use strict";
   // Real NASA FIRMS detections (MODIS NRT + VIIRS NOAA-20 NRT), Kazakhstan bounding box
-  // (46,40 to 87,55.5), pulled live via a personal FIRMS API key, September 2026.
+  // (46,40 to 87,55.5), pulled live via a personal FIRMS API key. 75 real days: the full
+  // NRT retention window available to this key, Sept 1 - Nov 14, 2026 (not just one month).
   var DATA = {
-    1:{m:26,v:374}, 2:{m:57,v:560}, 3:{m:163,v:755}, 4:{m:97,v:605}, 5:{m:119,v:682},
-    6:{m:463,v:1721}, 7:{m:656,v:2647}, 8:{m:418,v:1284}, 9:{m:124,v:598}, 10:{m:162,v:844},
-    11:{m:177,v:854}, 12:{m:130,v:825}, 13:{m:59,v:456}, 14:{m:86,v:624}, 15:{m:114,v:548},
-    16:{m:44,v:293}, 17:{m:23,v:348}, 18:{m:70,v:508}, 19:{m:94,v:520}, 20:{m:152,v:632},
-    21:{m:135,v:495}, 22:{m:110,v:513}, 23:{m:142,v:786}, 24:{m:119,v:677}, 25:{m:112,v:571},
-    26:{m:151,v:468}, 27:{m:160,v:635}, 28:{m:201,v:870}, 29:{m:225,v:898}, 30:{m:339,v:1102}
+    "2026-09-01": {m:26, v:374}, "2026-09-02": {m:57, v:560}, "2026-09-03": {m:163, v:755}, "2026-09-04": {m:97, v:605}, "2026-09-05": {m:119, v:682},
+    "2026-09-06": {m:463, v:1721}, "2026-09-07": {m:656, v:2647}, "2026-09-08": {m:418, v:1284}, "2026-09-09": {m:124, v:598}, "2026-09-10": {m:162, v:844},
+    "2026-09-11": {m:177, v:854}, "2026-09-12": {m:130, v:825}, "2026-09-13": {m:59, v:456}, "2026-09-14": {m:86, v:624}, "2026-09-15": {m:114, v:548},
+    "2026-09-16": {m:44, v:293}, "2026-09-17": {m:23, v:348}, "2026-09-18": {m:70, v:508}, "2026-09-19": {m:94, v:520}, "2026-09-20": {m:152, v:632},
+    "2026-09-21": {m:135, v:495}, "2026-09-22": {m:110, v:513}, "2026-09-23": {m:142, v:786}, "2026-09-24": {m:119, v:677}, "2026-09-25": {m:112, v:571},
+    "2026-09-26": {m:151, v:468}, "2026-09-27": {m:160, v:635}, "2026-09-28": {m:201, v:870}, "2026-09-29": {m:225, v:898}, "2026-09-30": {m:339, v:1102},
+    "2026-10-01": {m:185, v:577}, "2026-10-02": {m:157, v:609}, "2026-10-03": {m:22, v:132}, "2026-10-04": {m:33, v:170}, "2026-10-05": {m:32, v:259},
+    "2026-10-06": {m:37, v:207}, "2026-10-07": {m:61, v:274}, "2026-10-08": {m:101, v:391}, "2026-10-09": {m:53, v:501}, "2026-10-10": {m:104, v:503},
+    "2026-10-11": {m:128, v:666}, "2026-10-12": {m:130, v:256}, "2026-10-13": {m:251, v:769}, "2026-10-14": {m:127, v:562}, "2026-10-15": {m:153, v:638},
+    "2026-10-16": {m:141, v:549}, "2026-10-17": {m:33, v:588}, "2026-10-18": {m:172, v:538}, "2026-10-19": {m:107, v:545}, "2026-10-20": {m:108, v:701},
+    "2026-10-21": {m:128, v:561}, "2026-10-22": {m:111, v:541}, "2026-10-23": {m:140, v:527}, "2026-10-24": {m:103, v:520}, "2026-10-25": {m:100, v:816},
+    "2026-10-26": {m:180, v:839}, "2026-10-27": {m:157, v:937}, "2026-10-28": {m:168, v:861}, "2026-10-29": {m:124, v:771}, "2026-10-30": {m:131, v:836},
+    "2026-10-31": {m:157, v:803}, "2026-11-01": {m:72, v:559}, "2026-11-02": {m:85, v:390}, "2026-11-03": {m:105, v:384}, "2026-11-04": {m:59, v:238},
+    "2026-11-05": {m:35, v:254}, "2026-11-06": {m:14, v:136}, "2026-11-07": {m:16, v:176}, "2026-11-08": {m:29, v:251}, "2026-11-09": {m:26, v:155},
+    "2026-11-10": {m:13, v:123}, "2026-11-11": {m:2, v:31}, "2026-11-12": {m:2, v:35}, "2026-11-13": {m:3, v:37}, "2026-11-14": {m:4, v:53}
   };
-  // Baseline is this month's own median daily total (753) -- a robust proxy, not a true
-  // 10-year seasonal climatology (that needs a multi-year FIRMS pull we didn't have time for).
-  var BASELINE = 753;
+  // Baseline is the median daily total across all 75 real days -- a robust proxy, not a true
+  // 10-year seasonal climatology (that needs a multi-year FIRMS pull beyond this key's NRT window).
+  var BASELINE = 662;
   var MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var YEAR = 2026, MONTH_INDEX = 8; // September
-  var daysInMonth = 30;
+  var MIN_VIEW = { year:2026, month:8 }, MAX_VIEW = { year:2026, month:10 }; // Sept (8) .. Nov (10), 0-indexed
+  var currentView = { year:2026, month:8 };
+
+  function pad2(n){ return n < 10 ? "0" + n : String(n); }
+  function dateKey(year, month, day){ return year + "-" + pad2(month + 1) + "-" + pad2(day); }
+  function daysInCalMonth(year, month){ return new Date(year, month + 1, 0).getDate(); }
+  var ALL_DATES = Object.keys(DATA).sort();
 
   // Real NASA GIBS snapshots (MODIS true-color + fire overlay), fetched live for these 6 dates.
   var SAT_IMAGES = {
-    1: "/_blob/ad8c401ea036d442a7fc8d6564716e20",
-    7: "/_blob/8b6d506a439df4fff1d3329db94f9e5c",
-    9: "/_blob/fdc856fc7344043f93fd291b7b7f1256",
-    14: "/_blob/d3ef63aba8d1a9055ad51e945decf545",
-    17: "/_blob/41e2b845c9f3e40d6dde11d918202a0e",
-    23: "/_blob/ec2f8945df4e32c936a83af5ba41c255"
+    "2026-09-01": "/_blob/ad8c401ea036d442a7fc8d6564716e20",
+    "2026-09-07": "/_blob/8b6d506a439df4fff1d3329db94f9e5c",
+    "2026-09-09": "/_blob/fdc856fc7344043f93fd291b7b7f1256",
+    "2026-09-14": "/_blob/d3ef63aba8d1a9055ad51e945decf545",
+    "2026-09-17": "/_blob/41e2b845c9f3e40d6dde11d918202a0e",
+    "2026-09-23": "/_blob/ec2f8945df4e32c936a83af5ba41c255"
   };
 
-  // Real Isolation Forest (scikit-learn) run offline against the real FIRMS dataset above --
+  // Real Isolation Forest (scikit-learn) run offline against the real 75-day FIRMS dataset --
   // see ml/anomaly_model.py. [ml_anomaly_score 0-100, is_anomaly] per day, copied verbatim.
   var ML_SCORES = {
-    1: [28.5, false], 2: [9.2, false], 3: [10.4, false], 4: [2.5, false], 5: [3.7, false],
-    6: [73.3, true], 7: [100.0, true], 8: [56.5, true], 9: [0.0, false], 10: [10.9, false],
-    11: [13.3, false], 12: [12.5, false], 13: [18.4, false], 14: [5.4, false], 15: [0.6, false],
-    16: [44.2, true], 17: [30.7, true], 18: [10.6, false], 19: [1.3, false], 20: [3.6, false],
-    21: [7.3, false], 22: [1.8, false], 23: [9.1, false], 24: [3.7, false], 25: [0.4, false],
-    26: [14.4, false], 27: [5.1, false], 28: [16.2, false], 29: [22.7, false], 30: [48.9, true]
+    "2026-09-01": [23.2, false], "2026-09-02": [9.4, false], "2026-09-03": [12.8, false], "2026-09-04": [4.3, false], "2026-09-05": [6.5, false],
+    "2026-09-06": [80.4, true], "2026-09-07": [100.0, true], "2026-09-08": [66.5, true], "2026-09-09": [4.0, false], "2026-09-10": [12.4, false],
+    "2026-09-11": [13.1, false], "2026-09-12": [12.6, false], "2026-09-13": [15.5, false], "2026-09-14": [7.8, false], "2026-09-15": [0.7, false],
+    "2026-09-16": [21.4, false], "2026-09-17": [25.7, false], "2026-09-18": [8.3, false], "2026-09-19": [2.7, false], "2026-09-20": [4.4, false],
+    "2026-09-21": [7.8, false], "2026-09-22": [2.2, false], "2026-09-23": [12.4, false], "2026-09-24": [5.7, false], "2026-09-25": [1.9, false],
+    "2026-09-26": [14.1, false], "2026-09-27": [5.8, false], "2026-09-28": [20.7, false], "2026-09-29": [29.8, true], "2026-09-30": [56.7, true],
+    "2026-10-01": [14.5, false], "2026-10-02": [5.8, false], "2026-10-03": [23.4, false], "2026-10-04": [21.9, false], "2026-10-05": [16.4, false],
+    "2026-10-06": [22.2, false], "2026-10-07": [20.5, false], "2026-10-08": [15.8, false], "2026-10-09": [12.4, false], "2026-10-10": [4.8, false],
+    "2026-10-11": [5.6, false], "2026-10-12": [36.0, true], "2026-10-13": [32.5, true], "2026-10-14": [1.1, false], "2026-10-15": [4.7, false],
+    "2026-10-16": [2.4, false], "2026-10-17": [19.8, false], "2026-10-18": [11.5, false], "2026-10-19": [0.0, false], "2026-10-20": [12.4, false],
+    "2026-10-21": [1.5, false], "2026-10-22": [0.1, false], "2026-10-23": [4.1, false], "2026-10-24": [1.3, false], "2026-10-25": [22.4, false],
+    "2026-10-26": [13.7, false], "2026-10-27": [30.8, true], "2026-10-28": [13.7, false], "2026-10-29": [13.7, false], "2026-10-30": [13.6, false],
+    "2026-10-31": [12.2, false], "2026-11-01": [5.9, false], "2026-11-02": [17.0, false], "2026-11-03": [17.5, false], "2026-11-04": [22.5, false],
+    "2026-11-05": [15.9, false], "2026-11-06": [22.5, false], "2026-11-07": [24.6, false], "2026-11-08": [17.6, false], "2026-11-09": [21.3, false],
+    "2026-11-10": [26.4, false], "2026-11-11": [41.3, true], "2026-11-12": [35.2, true], "2026-11-13": [36.2, true], "2026-11-14": [41.0, true]
   };
 
   var sampleApi = null, downloadsApi = null;
@@ -300,18 +330,23 @@ svg.chart{ width:100%; height:auto; display:block; }
   function tierLabel(t){
     return { good:"normal", warning:"elevated", serious:"high", critical:"critical" }[t];
   }
-  function narrativeFor(day, m, v, tier){
+  function formatDate(dateKeyStr){
+    var parts = dateKeyStr.split("-");
+    var y = +parts[0], mo = +parts[1] - 1, d = +parts[2];
+    return MONTH_NAMES[mo] + " " + d + ", " + y;
+  }
+  function narrativeFor(dk, m, v, tier){
     var total = m + v, ratio = (total / BASELINE).toFixed(2);
-    if (day === 7) {
-      return "The real peak day in this month's actual FIRMS data (" + total + " combined detections, " + ratio + "x this month's median day). This bounding box covers all of Kazakhstan, so it's the country's total fire signal that week, not one isolated fire — the real September 2026 steppe and forest fire event (~2,870 ha) is part of this, alongside other burning.";
+    if (dk === "2026-09-07") {
+      return "The real peak day across the whole 75-day window (" + total + " combined detections, " + ratio + "x the median day). This bounding box covers all of Kazakhstan, so it's the country's total fire signal that week, not one isolated fire — the real September 2026 steppe and forest fire event (~2,870 ha) is part of this, alongside other burning.";
     }
-    if (tier === "critical") return "Well above this month's typical day (" + ratio + "x). Real satellite detections, not a simulated spike.";
-    if (tier === "serious") return "Elevated (" + ratio + "x the month's median). Worth a closer look at this specific date.";
+    if (tier === "critical") return "Well above the typical day across this 75-day window (" + ratio + "x). Real satellite detections, not a simulated spike.";
+    if (tier === "serious") return "Elevated (" + ratio + "x the median). Worth a closer look at this specific date.";
     if (tier === "warning") return "Mildly above typical (" + ratio + "x). Could be ordinary day-to-day variability — not an anomaly on its own.";
-    return "Within the normal range for this region this month (" + ratio + "x the median day).";
+    return "Within the normal range for this region across the Sept-Nov window (" + ratio + "x the median day).";
   }
 
-  var selectedDay = 7;
+  var selectedDate = "2026-09-07";
   var tooltipEl = document.getElementById("tooltip");
 
   function showTooltip(evt, html){
@@ -325,36 +360,57 @@ svg.chart{ width:100%; height:auto; display:block; }
   function hideTooltip(){ tooltipEl.classList.remove("show"); }
 
   function buildCalendar(){
-    document.getElementById("monthLabel").textContent = MONTH_NAMES[MONTH_INDEX] + " " + YEAR;
+    var year = currentView.year, month = currentView.month;
+    document.getElementById("monthLabel").textContent = MONTH_NAMES[month] + " " + year;
+    document.getElementById("prevMonthBtn").disabled = (year === MIN_VIEW.year && month === MIN_VIEW.month);
+    document.getElementById("nextMonthBtn").disabled = (year === MAX_VIEW.year && month === MAX_VIEW.month);
+
     var grid = document.getElementById("calGrid");
     grid.innerHTML = "";
-    var firstWeekday = new Date(YEAR, MONTH_INDEX, 1).getDay();
+    var firstWeekday = new Date(year, month, 1).getDay();
     for (var i = 0; i < firstWeekday; i++) {
       var blank = document.createElement("div");
       blank.className = "cal-cell empty";
       grid.appendChild(blank);
     }
-    for (var d = 1; d <= daysInMonth; d++) {
+    var totalDays = daysInCalMonth(year, month);
+    for (var d = 1; d <= totalDays; d++) {
       (function(day){
-        var rec = DATA[day];
+        var dk = dateKey(year, month, day);
+        var rec = DATA[dk];
+        var cell = document.createElement("button");
+        cell.textContent = String(day);
+        if (!rec) {
+          cell.className = "cal-cell no-data";
+          cell.disabled = true;
+          cell.setAttribute("aria-label", formatDate(dk) + ", no FIRMS data pulled for this date");
+          grid.appendChild(cell);
+          return;
+        }
         var total = rec.m + rec.v;
         var tier = tierFor(total);
-        var cell = document.createElement("button");
-        cell.className = "cal-cell" + (day === selectedDay ? " selected" : "");
+        cell.className = "cal-cell" + (dk === selectedDate ? " selected" : "");
         cell.dataset.tier = tier;
-        cell.textContent = String(day);
-        cell.setAttribute("aria-label", MONTH_NAMES[MONTH_INDEX] + " " + day + ", " + tierLabel(tier) + ", " + total + " combined detections");
-        cell.addEventListener("click", function(){ selectDay(day); });
+        cell.setAttribute("aria-label", formatDate(dk) + ", " + tierLabel(tier) + ", " + total + " combined detections");
+        cell.addEventListener("click", function(){ selectDay(dk); });
         cell.addEventListener("mouseenter", function(evt){
-          showTooltip(evt, "<b>" + MONTH_NAMES[MONTH_INDEX] + " " + day + "</b>" + total + " detections — " + tierLabel(tier));
+          showTooltip(evt, "<b>" + formatDate(dk) + "</b>" + total + " detections — " + tierLabel(tier));
         });
         cell.addEventListener("mousemove", function(evt){
-          showTooltip(evt, "<b>" + MONTH_NAMES[MONTH_INDEX] + " " + day + "</b>" + total + " detections — " + tierLabel(tier));
+          showTooltip(evt, "<b>" + formatDate(dk) + "</b>" + total + " detections — " + tierLabel(tier));
         });
         cell.addEventListener("mouseleave", hideTooltip);
         grid.appendChild(cell);
       })(d);
     }
+  }
+
+  function monthAbsIdx(v){ return v.year * 12 + v.month; }
+  function changeMonth(delta){
+    var minAbs = monthAbsIdx(MIN_VIEW), maxAbs = monthAbsIdx(MAX_VIEW);
+    var newAbs = Math.max(minAbs, Math.min(maxAbs, monthAbsIdx(currentView) + delta));
+    currentView = { year: Math.floor(newAbs / 12), month: newAbs % 12 };
+    buildCalendar();
   }
 
   function svgEl(tag, attrs){
@@ -405,42 +461,53 @@ svg.chart{ width:100%; height:auto; display:block; }
     svg.innerHTML = "";
     var W = 420, H = 170, left = 10, right = 10, top = 14, bottom = 26;
     var plotW = W - left - right, plotH = H - top - bottom;
+    var n = ALL_DATES.length;
     var maxVal = 0;
-    for (var dm = 1; dm <= daysInMonth; dm++) maxVal = Math.max(maxVal, DATA[dm].m + DATA[dm].v);
+    for (var i = 0; i < n; i++) maxVal = Math.max(maxVal, DATA[ALL_DATES[i]].m + DATA[ALL_DATES[i]].v);
     maxVal *= 1.1;
-    function x(day){ return left + ((day - 1) / (daysInMonth - 1)) * plotW; }
+    function x(idx){ return left + (idx / (n - 1)) * plotW; }
     function y(val){ return top + plotH - (val / maxVal) * plotH; }
 
     var baseY = y(BASELINE);
     var baseLine = svgEl("line", { x1:left, y1:baseY, x2:left+plotW, y2:baseY, stroke:"var(--baseline-line)", "stroke-width":1.5, "stroke-dasharray":"4 4" });
     svg.appendChild(baseLine);
 
+    // Month-boundary tick marks so the full Sept-Nov span reads as real history, not one block.
+    for (var mb = 1; mb < n; mb++) {
+      var prevMonth = ALL_DATES[mb-1].slice(0,7), curMonth = ALL_DATES[mb].slice(0,7);
+      if (prevMonth !== curMonth) {
+        var tx = x(mb) - ((x(mb)-x(mb-1))/2);
+        svg.appendChild(svgEl("line", { x1:tx, y1:top, x2:tx, y2:top+plotH, stroke:"var(--grid)", "stroke-width":1 }));
+      }
+    }
+
     var pts = [];
-    for (var d = 1; d <= daysInMonth; d++) pts.push(x(d) + "," + y(DATA[d].m + DATA[d].v));
+    for (var d = 0; d < n; d++) pts.push(x(d) + "," + y(DATA[ALL_DATES[d]].m + DATA[ALL_DATES[d]].v));
     var path = svgEl("path", { d:"M" + pts.join(" L"), fill:"none", stroke:"var(--series-modis)", "stroke-width":2, "stroke-linejoin":"round", "stroke-linecap":"round" });
     svg.appendChild(path);
 
-    for (var d2 = 1; d2 <= daysInMonth; d2++) {
-      (function(day){
-        var total = DATA[day].m + DATA[day].v;
-        var isSel = day === selectedDay;
-        var dot = svgEl("circle", { cx:x(day), cy:y(total), r: isSel ? 4.5 : 2.5, fill: isSel ? "var(--fg)" : "var(--series-modis)" });
+    for (var d2 = 0; d2 < n; d2++) {
+      (function(idx){
+        var dk = ALL_DATES[idx];
+        var total = DATA[dk].m + DATA[dk].v;
+        var isSel = dk === selectedDate;
+        var dot = svgEl("circle", { cx:x(idx), cy:y(total), r: isSel ? 4.5 : 2 , fill: isSel ? "var(--fg)" : "var(--series-modis)" });
         dot.style.cursor = "pointer";
-        dot.addEventListener("click", function(){ selectDay(day); });
-        dot.addEventListener("mouseenter", function(evt){ showTooltip(evt, "<b>Sept " + day + "</b>" + total + " combined detections"); });
-        dot.addEventListener("mousemove", function(evt){ showTooltip(evt, "<b>Sept " + day + "</b>" + total + " combined detections"); });
+        dot.addEventListener("click", function(){ selectDay(dk); });
+        dot.addEventListener("mouseenter", function(evt){ showTooltip(evt, "<b>" + formatDate(dk) + "</b>" + total + " combined detections"); });
+        dot.addEventListener("mousemove", function(evt){ showTooltip(evt, "<b>" + formatDate(dk) + "</b>" + total + " combined detections"); });
         dot.addEventListener("mouseleave", hideTooltip);
         svg.appendChild(dot);
       })(d2);
     }
   }
 
-  function updateSatPanel(day){
+  function updateSatPanel(dk){
     var img = document.getElementById("satImg"), missing = document.getElementById("satMissing");
-    var url = SAT_IMAGES[day];
+    var url = SAT_IMAGES[dk];
     if (url) {
       img.src = url;
-      img.alt = "NASA GIBS satellite snapshot, September " + day + ", 2026, Kazakhstan region";
+      img.alt = "NASA GIBS satellite snapshot, " + formatDate(dk) + ", Kazakhstan region";
       img.hidden = false;
       missing.hidden = true;
     } else {
@@ -453,24 +520,24 @@ svg.chart{ width:100%; height:auto; display:block; }
     var btn = document.getElementById("askClaudeBtn");
     var badge = document.getElementById("liveBadge");
     var narrativeEl = document.getElementById("narrativeText");
-    var day = selectedDay, rec = DATA[day], total = rec.m + rec.v, tier = tierFor(total);
+    var dk = selectedDate, rec = DATA[dk], total = rec.m + rec.v, tier = tierFor(total);
     if (!sampleApi) {
-      narrativeEl.textContent = "Live Claude call isn't available in this view. " + narrativeFor(day, rec.m, rec.v, tier);
+      narrativeEl.textContent = "Live Claude call isn't available in this view. " + narrativeFor(dk, rec.m, rec.v, tier);
       return;
     }
     btn.disabled = true; btn.textContent = "Asking Claude…";
     var prompt = "You are writing a plain-language read of a real satellite fire-detection count for a NASA Space Apps demo, for a fire manager (not a scientist). "
-      + "Region: Kazakhstan (country-wide bounding box). Date: September " + day + ", 2026. "
+      + "Region: Kazakhstan (country-wide bounding box). Date: " + formatDate(dk) + ". "
       + "Real MODIS detections (NASA FIRMS): " + rec.m + ". Real VIIRS NOAA-20 detections: " + rec.v + ". "
-      + "This month's own median daily total (used as a baseline proxy, not a multi-year climatology): " + BASELINE + ". "
+      + "Median daily total across the real 75-day Sept-Nov 2026 window (used as a baseline proxy, not a multi-year climatology): " + BASELINE + ". "
       + "Anomaly tier: " + tierLabel(tier) + ". "
       + "Write exactly 1-2 sentences. No disclaimers, no markdown, no restating the raw numbers back verbatim.";
     sampleApi(prompt).then(function(res){
-      if (day !== selectedDay) return;
+      if (dk !== selectedDate) return;
       narrativeEl.textContent = res.text;
       badge.hidden = false;
     }).catch(function(err){
-      narrativeEl.textContent = "Claude call failed (" + ((err && err.code) || "unknown") + "). " + narrativeFor(day, rec.m, rec.v, tier);
+      narrativeEl.textContent = "Claude call failed (" + ((err && err.code) || "unknown") + "). " + narrativeFor(dk, rec.m, rec.v, tier);
     }).then(function(){
       btn.disabled = false; btn.textContent = "Ask Claude live";
     });
@@ -478,30 +545,30 @@ svg.chart{ width:100%; height:auto; display:block; }
 
   function downloadCsv(){
     var btn = document.getElementById("csvBtn");
-    var rows = ["day,date,modis,viirs,combined,gap,tier,ratio_vs_baseline"];
-    for (var d = 1; d <= daysInMonth; d++) {
-      var rec = DATA[d], total = rec.m + rec.v, tier = tierFor(total), gap = rec.v - rec.m;
-      rows.push([d, "2026-09-" + (d < 10 ? "0" + d : d), rec.m, rec.v, total, gap, tierLabel(tier), (total / BASELINE).toFixed(2)].join(","));
+    var rows = ["date,modis,viirs,combined,gap,tier,ratio_vs_baseline"];
+    for (var i = 0; i < ALL_DATES.length; i++) {
+      var dk = ALL_DATES[i], rec = DATA[dk], total = rec.m + rec.v, tier = tierFor(total), gap = rec.v - rec.m;
+      rows.push([dk, rec.m, rec.v, total, gap, tierLabel(tier), (total / BASELINE).toFixed(2)].join(","));
     }
     var csv = rows.join("\n");
     if (!downloadsApi) {
       btn.textContent = "Not available in this view";
-      setTimeout(function(){ btn.textContent = "Download month as CSV"; }, 2200);
+      setTimeout(function(){ btn.textContent = "Download CSV (Sept-Nov)"; }, 2200);
       return;
     }
     btn.disabled = true; btn.textContent = "Saving…";
-    downloadsApi.save({ filename: "hotspots_september_2026.csv", data: csv })
+    downloadsApi.save({ filename: "hotspots_sep_nov_2026.csv", data: csv })
       .catch(function(){ btn.textContent = "Save declined"; })
       .then(function(){
-        setTimeout(function(){ btn.disabled = false; btn.textContent = "Download month as CSV"; }, 1200);
+        setTimeout(function(){ btn.disabled = false; btn.textContent = "Download CSV (Sept-Nov)"; }, 1200);
       });
   }
 
-  function selectDay(day){
-    selectedDay = day;
-    var rec = DATA[day];
+  function selectDay(dk){
+    selectedDate = dk;
+    var rec = DATA[dk];
     var total = rec.m + rec.v, tier = tierFor(total), gap = rec.v - rec.m;
-    document.getElementById("detailDate").textContent = MONTH_NAMES[MONTH_INDEX] + " " + day + ", " + YEAR;
+    document.getElementById("detailDate").textContent = formatDate(dk);
     var tierChip = document.getElementById("detailTier");
     tierChip.textContent = tierLabel(tier);
     tierChip.dataset.tier = tier;
@@ -509,22 +576,27 @@ svg.chart{ width:100%; height:auto; display:block; }
     document.getElementById("statViirs").textContent = rec.v;
     document.getElementById("statGap").textContent = (gap >= 0 ? "+" : "") + gap;
     document.getElementById("statBaseline").innerHTML = (total / BASELINE).toFixed(1) + "<small>×</small>";
-    var mlScore = ML_SCORES[day], mlEl = document.getElementById("statMl");
+    var mlScore = ML_SCORES[dk], mlEl = document.getElementById("statMl");
     mlEl.textContent = mlScore[0].toFixed(1);
     mlEl.classList.toggle("is-normal", !mlScore[1]);
-    document.getElementById("narrativeText").textContent = narrativeFor(day, rec.m, rec.v, tier);
+    document.getElementById("narrativeText").textContent = narrativeFor(dk, rec.m, rec.v, tier);
     document.getElementById("liveBadge").hidden = true;
-    updateSatPanel(day);
+    updateSatPanel(dk);
     buildBarChart(rec.m, rec.v);
+    // Jump the calendar's visible month to match the selected date (so clicking a trend-chart
+    // point outside the current month view brings that month into view automatically).
+    currentView = { year: +dk.slice(0,4), month: +dk.slice(5,7) - 1 };
     buildCalendar();
     buildTrendChart();
   }
 
   document.getElementById("askClaudeBtn").addEventListener("click", askClaudeLive);
   document.getElementById("csvBtn").addEventListener("click", downloadCsv);
+  document.getElementById("prevMonthBtn").addEventListener("click", function(){ changeMonth(-1); });
+  document.getElementById("nextMonthBtn").addEventListener("click", function(){ changeMonth(1); });
 
   buildCalendar();
   buildTrendChart();
-  selectDay(selectedDay);
+  selectDay(selectedDate);
 })();
 </script>
