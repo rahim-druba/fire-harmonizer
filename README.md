@@ -23,12 +23,20 @@ Fire managers, researchers, and emergency responders are left without one consis
 
 ## Live demo
 
-| Artifact | What it shows |
-|---|---|
-| **[Fire Harmonizer Prototype](https://claude.ai/artifact/4mLbtg7VCFqEqd3JJ58EED)** | The interactive product — a navigable calendar across 75 real days (Sept 1 - Nov 14, 2026), severity-colored, MODIS-vs-VIIRS gap chart, a full-range trend chart, real NASA satellite snapshots, a live Claude-generated narrative, a real ML anomaly score, and CSV export |
-| **[Architecture diagrams](https://claude.ai/artifact/GTXE5hpJBJT8VVf31PXvD4)** | How data actually moves: satellite → harmonization → anomaly engine → narrative, and who calls whom over the network |
+**[Open Fire Harmonizer](https://fire-harmonizer-ruddy.vercel.app/)**
 
-Both links are shared as "anyone with the link."
+| Page | What it shows |
+|---|---|
+| **[Fire Activity Dashboard](https://fire-harmonizer-ruddy.vercel.app/dashboard.html)** | 75 real days (Sept 1 – Nov 14, 2026), severity-colored calendar, MODIS-vs-VIIRS gap chart, full-range trend, NASA satellite snapshots, offline ML scores, and CSV export |
+| **[Region Picker](https://fire-harmonizer-ruddy.vercel.app/region-picker.html)** | Draw a region and choose a date range to request live MODIS and VIIRS counts from NASA FIRMS |
+
+Scan the QR code to open the live app on your phone, or click it to open the website:
+
+<a href="https://fire-harmonizer-ruddy.vercel.app/">
+  <img src="docs/images/live-demo-qr.png" alt="QR code linking to the live Fire Harmonizer website" width="240" height="240">
+</a>
+
+[How the app works ↓](#architecture)
 
 ## What it actually does
 
@@ -64,15 +72,35 @@ The demo is grounded in a real, recent event rather than a generic example: the 
 
 ## Architecture
 
-```
-MODIS ─┐
-       ├─▶ NASA FIRMS API ─▶ Harmonization Layer ─▶ Baseline + Anomaly Engine ─▶ Claude Narrative Layer ─▶ Map + Calendar UI
-VIIRS ─┘
+The historical dashboard and live region lookup share NASA FIRMS as their data source, but run as separate flows:
+
+```mermaid
+flowchart TD
+    MODIS["MODIS · Terra / Aqua"] --> FIRMS["NASA FIRMS"]
+    VIIRS["VIIRS · NOAA-20"] --> FIRMS
+
+    subgraph History["Historical dashboard"]
+        CSV["75-day Kazakhstan CSV"] --> Counts["Daily counts + median baseline"]
+        CSV --> ML["Offline Isolation Forest"]
+        Counts --> Dashboard["Calendar, charts + CSV export"]
+        ML -->|"Prepared scores"| Dashboard
+    end
+
+    FIRMS -->|"Historical export"| CSV
+    GIBS["NASA GIBS"] -->|"Saved snapshots"| Dashboard
+
+    subgraph Live["Live region lookup"]
+        Picker["Region picker"] -->|"Request"| API["Express /api/hotspots"]
+        API -->|"MODIS and VIIRS counts"| Picker
+    end
+
+    API -->|"Server-side FIRMS key"| FIRMS
+    FIRMS -->|"Active-fire records"| API
 ```
 
-Full diagrams (data pipeline + request flow, with network hops numbered) are in the [architecture artifact](https://claude.ai/artifact/GTXE5hpJBJT8VVf31PXvD4).
+The dashboard's counts and ML scores are prepared from the real 75-day dataset and embedded in the page. Its baseline is the median daily total across that window. Region-picker results do not update the historical calendar. The Express backend keeps the FIRMS key on the server; `app.js` also serves the official announcements endpoint.
 
-**Why this split:** the published literature on MODIS/VIIRS reconciliation shows no single global correction factor works — fitted coefficients are sensor-pair- and region-specific. So instead of claiming a universal calibration we don't have, the harmonization layer puts both sensors on a common grid/time basis, and the anomaly layer does honest statistics (seasonal z-score + an independent ML cross-check) rather than a black-box number.
+This is a transparent comparison and anomaly cross-check, not full sensor calibration or deduplication. See [the research notes](RESEARCH.md) for the rationale and limits.
 
 ## Repository structure
 
@@ -97,7 +125,7 @@ Full diagrams (data pipeline + request flow, with network hops numbered) are in 
 
 ## Running it locally
 
-The product itself (`web/fire-harmonizer.html`) is a self-contained static page — open it directly in a browser, no build step.
+Run `npm start` to serve the website from `public/`, including the dashboard, region picker, and announcements. There is no frontend build step.
 
 To re-run the anomaly model:
 
@@ -107,7 +135,7 @@ pip install -r requirements.txt
 python3 anomaly_model.py
 ```
 
-The Express backend (`server.js`) also serves a **real-time Leaflet region picker** at `/region-picker.html` — draw a rectangle on a real OpenStreetMap map, pick a date, and it calls NASA FIRMS live through a server-side key (never exposed to the browser) for real MODIS + VIIRS counts in that exact region. This has to run as a real served page, not the claude.ai artifact above, because the artifact's sandbox blocks the external map tile images Leaflet needs.
+The Express backend (`app.js`, importing `server.js`) serves a **real-time Leaflet region picker** at `/region-picker.html` — draw a rectangle on a real OpenStreetMap map, pick a date, and it calls NASA FIRMS live through a server-side key (never exposed to the browser) for real MODIS + VIIRS counts in that exact region.
 
 ```bash
 npm install
