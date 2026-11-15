@@ -1,0 +1,14 @@
+{
+  "aqua.jpg": {
+    "credit": "NASA, Aqua mission illustration",
+    "page": "https://science.nasa.gov/mission/aqua/",
+    "asset": "https://assets.science.nasa.gov/dynamicimage/assets/science/missions/aqua/aqua_mission_banner.jpg?fit=clip&w=800",
+    "retrieved": "2026-11-15"
+  },
+  "noaa20-earth.webp": {
+    "credit": "NOAA/NESDIS, NOAA-20 VIIRS true-color composite, April 12, 2018",
+    "page": "https://www.nesdis.noaa.gov/news/noaa-20-shares-new-view-of-the-north-pole-earth-day",
+    "asset": "https://www.nesdis.noaa.gov/s3/styles/webp/s3/migrated/20180412-NOAA-20.png.webp?itok=KC8NV1ZR",
+    "retrieved": "2026-11-15"
+  }
+}

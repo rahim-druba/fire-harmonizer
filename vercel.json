@@ -2,12 +2,19 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "builds": [
     {
-      "src": "server.js",
+      "src": "app.js",
       "use": "@vercel/node",
-      "config": { "includeFiles": ["public/**"] }
+      "config": {
+        "includeFiles": [
+          "public/**"
+        ]
+      }
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "server.js" }
+    {
+      "src": "/(.*)",
+      "dest": "app.js"
+    }
   ]
 }

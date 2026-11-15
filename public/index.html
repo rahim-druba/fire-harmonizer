@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Fire Harmonizer — Local Tools</title>
+<title>Fire Harmonizer — Satellite fire observations</title>
 <style>
   html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background: #0b0b10; color: #eee; }
   .wrap { max-width: 560px; margin: 0 auto; padding: 48px 24px; }
@@ -23,10 +23,25 @@
 <script src="/vendor/gsap/gsap-3.13.0.min.js" defer></script>
 <script src="/vendor/gsap/ScrollTrigger-3.13.0.min.js" defer></script>
 <script src="/interface.js" defer></script>
+<script src="/navigation.js" defer></script>
 </head>
 <body class="landing">
 <div class="wrap">
-  <header class="masthead"><div class="site-mark"><span class="sensor-mark" aria-hidden="true"><i></i><i></i></span>Fire Harmonizer</div><span class="edition">NASA Space Apps / 2026</span></header>
+<header class="project-header home-header">
+  <div class="project-brand-row">
+    <a class="site-mark" href="/" aria-label="Fire Harmonizer home"><span class="sensor-mark" aria-hidden="true"><i></i><i></i></span>Fire Harmonizer</a>
+    <span class="edition">NASA Space Apps / 2026</span>
+  </div>
+  <button class="home-menu-toggle" id="home-menu-toggle" type="button" aria-controls="home-navigation" aria-expanded="false" hidden>Menu <span aria-hidden="true">+</span></button>
+  <nav class="project-nav" id="home-navigation" aria-label="Primary navigation"><a href="/" aria-current="page">Home</a>
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/region-picker.html">Region picker</a>
+    <a href="/data-sources.html">Data sources</a>
+    <a href="/announcements.html">Announcements</a>
+    <a href="/research.html">Research</a>
+    <a href="/about.html">About us</a>
+  <a class="nav-back" href="/" data-go-back aria-label="Go back to the previous page"><span aria-hidden="true">←</span> Back</a></nav>
+</header>
   <section class="landing-intro" aria-labelledby="project-title">
   <div class="intro-copy">
   <h1 id="project-title">Fire Harmonizer</h1>
@@ -56,8 +71,7 @@
   </figure>
   <aside class="challenge-credit">
     <a class="challenge-logo" href="https://www.spaceappschallenge.org/" aria-label="NASA Space Apps Challenge official website"><img src="/space-apps/space-apps.webp" alt="NASA Space Apps Challenge" width="220" height="88" loading="lazy"></a>
-    <p>Built for NASA Space Apps 2026<br><span>Team Leeping · Almaty, Kazakhstan</span></p>
-    <a class="source-link" href="https://www.spaceappschallenge.org/">Explore the challenge <span aria-hidden="true">↗</span></a>
+    <p>Built for NASA Space Apps 2026<br><span>Team Leeping</span><br><span class="event-location"><img src="/kazakhstan-flag.webp" width="28" height="14" alt="" loading="lazy">Almaty, Kazakhstan</span></p>
   </aside>
   </div>
 

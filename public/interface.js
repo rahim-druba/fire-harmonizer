@@ -2,6 +2,37 @@
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  // Navigation stays usable even when animation libraries do not load.
+  const menuButton = document.getElementById('home-menu-toggle');
+  if (menuButton) {
+    const menu = document.getElementById('home-navigation');
+    const header = menuButton.closest('.home-header');
+    const compact = window.matchMedia('(max-width: 960px)');
+    const setMenu = open => {
+      menuButton.setAttribute('aria-expanded', String(open));
+      menu.hidden = compact.matches && !open;
+    };
+    const syncMenu = () => {
+      const focusInMenu = menu.contains(document.activeElement);
+      const focusOnButton = document.activeElement === menuButton;
+      menuButton.hidden = !compact.matches;
+      setMenu(false);
+      if (compact.matches && focusInMenu) menuButton.focus();
+      else if (!compact.matches && focusOnButton) menu.querySelector('a').focus();
+    };
+    header.classList.add('menu-ready');
+    menuButton.addEventListener('click', () => setMenu(menuButton.getAttribute('aria-expanded') !== 'true'));
+    header.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && compact.matches && !menu.hidden) {
+        setMenu(false); menuButton.focus();
+      }
+    });
+    header.addEventListener('focusout', event => { if (!header.contains(event.relatedTarget)) setMenu(false); });
+    document.addEventListener('click', event => { if (!header.contains(event.target)) setMenu(false); });
+    compact.addEventListener('change', syncMenu);
+    syncMenu();
+  }
+
   // Keep map accessibility independent of the optional animation libraries.
   const syncLeafletMotion = () => {
     if (!document.body.classList.contains('region')) return;
@@ -116,7 +147,7 @@
       opening = gsap.timeline();
       if (document.body.classList.contains('landing')) {
         opening.delay(eagleIntro());
-        enter(opening, '.masthead', 0, {y:mobile ? -4 : -8, duration:0.4});
+        enter(opening, '.project-header', 0, {y:mobile ? -4 : -8, duration:0.4});
         enter(opening, '.landing h1', 0.08, {duration:mobile ? 0.45 : 0.6});
         enter(opening, '.landing .intro-copy > .sub', 0.16);
         enter(opening, '.earth-figure', 0.12, {y:12, rotation:-4, duration:0.8});
@@ -129,7 +160,7 @@
         enter(opening, '.sensor-mark i:first-child', 0.08, {x:-6, y:0, duration:0.5});
         enter(opening, '.sensor-mark i:last-child', 0.12, {x:6, y:0, duration:0.5});
       } else if (document.body.classList.contains('dashboard')) {
-        enter(opening, '.dashboard .topnav, .dashboard h1', 0, {stagger:0.05});
+        enter(opening, '.dashboard .project-header, .dashboard h1', 0, {stagger:0.05});
         enter(opening, '.cal-head', 0.08);
         enter(opening, '.cal-cell[data-tier]', 0.12, {
           y:mobile ? 4 : 8, duration:0.32, stagger:{amount:0.22, from:'start'}
@@ -138,7 +169,7 @@
         enter(opening, '.stat', 0.14, {duration:0.36, stagger:0.04});
         enter(opening, '.chart-box', 0.2, {duration:0.38, stagger:0.06});
       } else {
-        enter(opening, '.region #panel > nav, .region #panel > h1, .region #panel > .sub, .region #bbox', 0, {
+        enter(opening, '.region #panel > .project-header, .region #panel > h1, .region #panel > .sub, .region #bbox', 0, {
           duration:0.4, stagger:0.05, y:mobile ? 6 : 10
         });
       }

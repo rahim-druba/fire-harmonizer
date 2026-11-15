@@ -36,11 +36,12 @@
 <script src="/vendor/gsap/gsap-3.13.0.min.js" defer></script>
 <script src="/vendor/gsap/ScrollTrigger-3.13.0.min.js" defer></script>
 <script src="/interface.js" defer></script>
+<script src="/navigation.js" defer></script>
 </head>
 <body class="region">
 <div id="map"></div>
 <div id="panel">
-  <nav><a href="/">Home</a><a href="/dashboard.html">Dashboard</a></nav>
+  <header class="project-header"><div class="project-brand-row"><a class="site-mark" href="/" aria-label="Fire Harmonizer home"><span class="sensor-mark" aria-hidden="true"><i></i><i></i></span>Fire Harmonizer</a><span class="edition">NASA Space Apps / 2026</span></div><nav class="project-nav" aria-label="Primary navigation"><a href="/">Home</a><a href="/dashboard.html">Dashboard</a><a href="/region-picker.html" aria-current="page">Region picker</a><a href="/data-sources.html">Data sources</a><a href="/announcements.html">Announcements</a><a href="/research.html">Research</a><a href="/about.html">About us</a><a class="nav-back" href="/" data-go-back aria-label="Go back to the previous page"><span aria-hidden="true">←</span> Back</a></nav></header>
   <h1>Region Picker</h1>
   <div class="sub">Draw a rectangle on the map, pick a date, get real NASA FIRMS counts for that exact region — live, not pre-baked.</div>
 

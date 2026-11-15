@@ -1,0 +1,80 @@
+{
+  "checkedAt": "2026-11-15T18:20:33.634Z",
+  "sources": [
+    {
+      "id": "firms",
+      "name": "NASA FIRMS",
+      "url": "https://www.earthdata.nasa.gov/data/tools/firms",
+      "status": "saved"
+    },
+    {
+      "id": "earthdata",
+      "name": "NASA Earthdata",
+      "url": "https://www.earthdata.nasa.gov/news",
+      "status": "saved"
+    },
+    {
+      "id": "nasa",
+      "name": "NASA",
+      "url": "https://www.nasa.gov/feed/",
+      "status": "saved"
+    }
+  ],
+  "items": [
+    {
+      "title": "Transitioning From Suomi NPP to NOAA-20 and NOAA-21: What LANCE Users Need to Know",
+      "url": "https://www.earthdata.nasa.gov/news/blog/transitioning-from-suomi-npp-noaa-20-noaa-21-what-lance-users-need-know",
+      "publishedAt": "2026-11-03T00:00:00.000Z",
+      "source": "NASA FIRMS",
+      "topics": [
+        "FIRMS"
+      ]
+    },
+    {
+      "title": "Transitioning from Suomi NPP VIIRS & OMPS: What FIRMS Users Need to Know",
+      "url": "https://www.earthdata.nasa.gov/news/blog/transitioning-from-suomi-npp-viirs-omps-what-firms-users-need-know",
+      "publishedAt": "2026-10-27T00:00:00.000Z",
+      "source": "NASA FIRMS",
+      "topics": [
+        "VIIRS",
+        "FIRMS"
+      ]
+    },
+    {
+      "title": "New Higher-Resolution Aerosol Index, Pyrocumulonimbus Layers Now Available in NASA FIRMS",
+      "url": "https://www.earthdata.nasa.gov/news/blog/new-higher-resolution-aerosol-index-pyrocumulonimbus-layers-now-available-nasa-firms",
+      "publishedAt": "2026-10-13T00:00:00.000Z",
+      "source": "NASA FIRMS",
+      "topics": [
+        "FIRMS"
+      ]
+    },
+    {
+      "title": "New FIRMS Data Product: Satellite Swath Outlines",
+      "url": "https://www.earthdata.nasa.gov/news/blog/new-firms-data-product-satellite-swath-outlines",
+      "publishedAt": "2026-06-25T00:00:00.000Z",
+      "source": "NASA FIRMS",
+      "topics": [
+        "FIRMS"
+      ]
+    },
+    {
+      "title": "Empowering Fire Managers: New HLS Capabilities in NASA's FIRMS",
+      "url": "https://www.earthdata.nasa.gov/events/empowering-fire-managers-new-hls-capabilities-nasas-firms",
+      "publishedAt": "2026-06-17T00:00:00.000Z",
+      "source": "NASA FIRMS",
+      "topics": [
+        "FIRMS"
+      ]
+    },
+    {
+      "title": "Customize Fire Related Imagery Through the HLS Interface, TiTiler, and FIRMS",
+      "url": "https://www.earthdata.nasa.gov/learn/tutorials/customize-fire-related-imagery-through-hls-interface-titiler-firms",
+      "publishedAt": "2026-04-29T00:00:00.000Z",
+      "source": "NASA FIRMS",
+      "topics": [
+        "FIRMS"
+      ]
+    }
+  ]
+}
