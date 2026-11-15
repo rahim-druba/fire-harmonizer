@@ -23,7 +23,7 @@ Fire managers, researchers, and emergency responders are left without one consis
 
 ## Live demo
 
-**[Open Fire Harmonizer](https://fire-harmonizer-ruddy.vercel.app/)**
+**Open Fire Harmonizer:** <a href="https://fire-harmonizer-ruddy.vercel.app/"><strong><ins>https://fire-harmonizer-ruddy.vercel.app/</ins></strong></a>
 
 - Explore 75 days of real fire detections, sensor comparisons, satellite imagery, and ML anomaly scores.
 - Look up live MODIS and VIIRS counts for a selected region and date range.
