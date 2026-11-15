@@ -118,6 +118,19 @@ npm start
 - **Data sources:** [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) (MODIS + VIIRS active-fire detections), [NASA GIBS](https://wiki.earthdata.nasa.gov/display/GIBS) (satellite snapshot imagery)
 - **Design:** a colorblind-validated categorical/status palette (see `RESEARCH.md` methodology)
 
+## Model validation — and why there's no accuracy score
+
+Isolation Forest is **unsupervised** — there's no labeled ground truth for "this day was truly anomalous," so a textbook accuracy/precision/recall against ground truth doesn't honestly exist for this task. Claiming one would be the kind of overclaim this project has tried hard to avoid.
+
+What we report instead is **agreement between two independently-designed methods** looking at the same real FIRMS data — a ratio-to-baseline rule, and the ML model:
+
+|  | ML: anomaly | ML: normal |
+|---|---|---|
+| **Rule: high/critical** | 4 | 0 |
+| **Rule: normal/mild** | 2 | 24 |
+
+**93.3% agreement**, **100% recall** (every rule-flagged severe day is also caught by the model), **66.7% precision** (2 of 6 ML-flagged days are mild/normal by the rule). The 2 disagreements are both *low*-activity days — Isolation Forest flags statistical outliers in either direction, so an unusually quiet day scores as "unusual" too, which is expected model behavior, not a bug. Run `ml/anomaly_model.py` to reproduce this exactly.
+
 ## Research
 
 [`RESEARCH.md`](RESEARCH.md) is a short literature review on why MODIS and VIIRS diverge, what harmonization methods already exist in the published science, and what that means for this build's design choices — fully cited (Li 2018, Vadrevu 2018, Blackett 2015, White 2023, Li 2020, Zheng 2026, Giglio 2025, and others).

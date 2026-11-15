@@ -56,10 +56,51 @@ ml_score = ((hi - raw_score) / (hi - lo) * 100).round(1)
 df["ml_anomaly_score"] = ml_score
 df["ml_flag"] = np.where(is_outlier == -1, "anomaly", "normal")
 
+def tier_for(ratio):
+    if ratio > 2.2: return "critical"
+    if ratio > 1.5: return "serious"
+    if ratio > 1.1: return "warning"
+    return "good"
+
+
+def print_agreement_matrix():
+    """
+    IMPORTANT CAVEAT: Isolation Forest is unsupervised -- there is no labeled ground
+    truth for "this day was truly anomalous." A textbook accuracy/precision/recall
+    against ground truth does not honestly exist here. What follows instead is the
+    AGREEMENT between two independently-designed methods (a ratio-to-baseline rule,
+    and an unsupervised ML model) looking at the same real data -- useful because
+    they're methodologically independent, not because either one is "truth."
+    """
+    d = df.copy()
+    d["tier"] = d["ratio"].apply(tier_for)
+    d["rule_flag"] = d["tier"].isin(["serious", "critical"])
+    d["ml_flag_bool"] = d["ml_flag"] == "anomaly"
+
+    tp = int(((d.rule_flag) & (d.ml_flag_bool)).sum())
+    fn = int(((d.rule_flag) & (~d.ml_flag_bool)).sum())
+    fp = int(((~d.rule_flag) & (d.ml_flag_bool)).sum())
+    tn = int(((~d.rule_flag) & (~d.ml_flag_bool)).sum())
+
+    precision = tp / (tp + fp) if (tp + fp) else float("nan")
+    recall = tp / (tp + fn) if (tp + fn) else float("nan")
+    accuracy = (tp + tn) / len(d)
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else float("nan")
+
+    print("\nAgreement matrix: rule-based tier (serious/critical) vs ML Isolation Forest flag\n")
+    print(f"{'':20}{'ML: anomaly':>14}{'ML: normal':>14}")
+    print(f"{'Rule: high/critical':20}{tp:>14}{fn:>14}")
+    print(f"{'Rule: normal/mild':20}{fp:>14}{tn:>14}")
+    print(f"\nAgreement: {accuracy:.1%}  Recall: {recall:.1%}  Precision: {precision:.1%}  F1: {f1:.2f}")
+    print(f"ML-only flags (disagreement): {list(d[(~d.rule_flag) & (d.ml_flag_bool)].index)} "
+          f"-- both low-activity days the model reads as statistically unusual in the other direction.")
+
+
 if __name__ == "__main__":
     pd.set_option("display.width", 100)
     print(f"Baseline (this month's median daily total): {BASELINE}")
     print(df)
+    print_agreement_matrix()
     print()
     print("JS object literal (day: [ml_score, flag]):")
     print("{")
