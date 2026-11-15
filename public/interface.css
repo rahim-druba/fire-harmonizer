@@ -50,6 +50,62 @@ button:not(:disabled):active, a.card:active { transform:translateY(1px); }
 .landing .shot-frame { max-width:380px; aspect-ratio:2 / 1; border-radius:4px; border-color:var(--border); }
 .landing .shot-frame img { height:100%; object-fit:cover; object-position:top; }
 .landing .briefing figcaption { color:var(--muted); max-width:380px; font-size:10px; line-height:1.5; margin-top:6px; }
+/* A pale atmospheric tint leaves the existing sensor colors in charge. */
+.landing { --bg:#f1f5f7; --surface-2:#e5edf3; --border:#d2dee6; --fg:#182b3a; --muted:#566977; min-height:100%; height:auto; }
+.landing .masthead { margin-bottom:32px; }
+.landing-intro { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(240px,1fr); align-items:center; gap:32px; margin-bottom:28px; }
+.landing .intro-copy .sub { margin-bottom:0; }
+.earth-figure { text-align:center; padding:0 12px; }
+.earth-figure img { display:block; width:100%; height:auto; max-width:320px; margin:auto; }
+.earth-figure span { display:block; font:400 11px 'IBM Plex Mono',monospace; color:var(--muted); margin-top:-12px; }
+.evidence-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:24px; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); align-items:center; }
+.landing .evidence-grid .briefing { margin:0; padding:0; border:0; }
+.challenge-credit { padding:12px 0; }
+.challenge-logo { display:inline-flex; background:#1d2b80; padding:16px 20px; border-radius:4px; }
+.challenge-logo img { display:block; width:176px; height:auto; }
+.challenge-credit p { font-size:13px; line-height:1.8; margin:16px 0 8px; }
+.challenge-credit p span { color:var(--muted); }
+.source-link { color:var(--fg); font-size:12px; text-underline-offset:4px; }
+.agency-section { margin-top:48px; padding:24px 28px 16px; background:#fff; color:#182b3a; border-radius:4px; }
+.agency-heading { display:flex; align-items:center; gap:24px; padding-bottom:16px; border-bottom:1px solid #e6edf2; }
+.agency-heading > img { width:72px; height:64px; object-fit:contain; }
+.agency-heading h2 { margin:0; font:500 19px/1.4 'Space Grotesk',sans-serif; }
+.agency-heading p { margin:4px 0 0; font-size:12px; color:#566977; }
+.agency-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); align-items:center; gap:16px 24px; list-style:none; margin:24px 0; padding:0; }
+.agency-grid li { height:64px; display:flex; align-items:center; justify-content:center; }
+.agency-grid img { max-width:100%; max-height:64px; width:auto; height:auto; object-fit:contain; }
+.agency-source { font-size:10px; line-height:1.7; color:#566977; border-top:1px solid #e6edf2; padding-top:12px; margin:0; }
+.agency-source a { color:inherit; text-underline-offset:3px; }
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) .landing { --bg:#121d26; --surface-2:#1d2c39; --border:#2f4354; --fg:#e7eff5; --muted:#a0b5c5; }
+}
+:root[data-theme="dark"] .landing { --bg:#121d26; --surface-2:#1d2c39; --border:#2f4354; --fg:#e7eff5; --muted:#a0b5c5; }
+@media (max-width:760px) {
+  .landing-intro { grid-template-columns:minmax(0,1fr) 180px; gap:12px; }
+  .landing h1 { font-size:48px; }
+  .earth-figure { padding:0; }
+  .earth-figure span { font-size:9px; margin-top:0; }
+  .agency-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+}
+@media (max-width:520px) {
+  .landing-intro { position:relative; display:block; }
+  .landing h1 { font-size:44px; max-width:8ch; padding-top:4px; margin-bottom:24px; }
+  .earth-figure { position:absolute; top:0; right:-8px; width:128px; pointer-events:none; }
+  .earth-figure span { display:none; }
+  .landing .sub { font-size:14px; }
+  .evidence-grid { grid-template-columns:1fr; gap:20px; }
+  .challenge-credit { padding:0; }
+  .agency-section { padding:20px 16px 16px; margin-top:32px; }
+  .agency-heading { gap:12px; align-items:flex-start; }
+  .agency-heading > img { width:48px; height:48px; }
+  .agency-heading h2 { font-size:17px; }
+  .agency-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 16px; }
+  .agency-grid li { height:48px; }
+  .agency-grid img { max-height:48px; }
+}
+@media (max-width:380px) {
+  .earth-figure { width:88px; top:-40px; right:0; }
+}
 .dashboard { padding-block:32px 64px; }
 .dashboard .wrap { max-width:1200px; }
 .topnav { display:flex; align-items:center; gap:24px; border-bottom:1px solid var(--border); padding-bottom:18px; margin-bottom:32px; }

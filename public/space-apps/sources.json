@@ -1,0 +1,165 @@
+{
+  "source": "https://www.spaceappschallenge.org/",
+  "partners": "https://www.spaceappschallenge.org/2026/space-agency-partners/",
+  "retrieved": "2026-11-15",
+  "note": "Official marks resized proportionally and losslessly encoded as WebP. Agencies are partners of NASA Space Apps, not endorsements of this project.",
+  "logos": [
+    {
+      "file": "space-apps.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Space_Apps_Logo_Color_and_White.width-440.jpegquality-60.png",
+      "alt": "Space Apps Logo 2026 color",
+      "name": "NASA Space Apps Challenge",
+      "width": 320,
+      "height": 125
+    },
+    {
+      "file": "nasa.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/NASA_logo.width-580.png",
+      "alt": "NASA Logo",
+      "name": "NASA",
+      "width": 192,
+      "height": 160
+    },
+    {
+      "file": "ggpen.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Angola_GGPEN_logo_large.width-1024.png",
+      "alt": "The logo for the Angola National Space Programme Management Office are the letters GGPEN in blue with a satellite circling it.",
+      "name": "Angola National Space Programme Management Office (GGPEN)",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "conae.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Screenshot_2023-08-07_at_12.31.21_PM.original.width-1024.png",
+      "alt": "CONAE logo2.original",
+      "name": "Argentine National Space Activities Commission (CONAE)",
+      "width": 249,
+      "height": 160
+    },
+    {
+      "file": "bsa.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Bahrain_Space_Agency_Logo.original.width-1024.png",
+      "alt": "Bahrain_Space_Agency_Logo2.original",
+      "name": "Bahrain Space Agency",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "aeb.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Brazilian_Space_Agency_logo.width-1024.png",
+      "alt": "Brazilian Space Agency logo",
+      "name": "Brazilian Space Agency (AEB)",
+      "width": 228,
+      "height": 160
+    },
+    {
+      "file": "csa.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Light_backgrounds_vertical_coloured_logo_r6v4.width-1024.png",
+      "alt": "CSA vertical logo",
+      "name": "Canadian Space Agency",
+      "width": 275,
+      "height": 160
+    },
+    {
+      "file": "esa.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/esa_2026_logo_large.original.width-1024.png",
+      "alt": "esa_2026_logo_large.original",
+      "name": "European Space Agency (ESA)",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "isro.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/ISRO_India.width-1024.png",
+      "alt": "Indian Space Research Organization",
+      "name": "Indian Space Research Organisation (ISRO)",
+      "width": 166,
+      "height": 160
+    },
+    {
+      "file": "asi.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/ASI_Italy.width-1024.png",
+      "alt": "Italian Space Agency",
+      "name": "Italian Space Agency (ASI)",
+      "width": 183,
+      "height": 160
+    },
+    {
+      "file": "jaxa.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/JAXA_thumbnail.original.width-1024.png",
+      "alt": "JAXA_logo_square",
+      "name": "Japan Aerospace Exploration Agency (JAXA)",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "kasa.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/KASA_logo_large.original.width-1024.png",
+      "alt": "KASA logo",
+      "name": "Korea AeroSpace Administration (KASA)",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "nasrda.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/NASRDA_Logo.width-1024.png",
+      "alt": "NASRDA logo_transparent",
+      "name": "National Space Research and Development Agency, Nigeria (NASRDA)",
+      "width": 161,
+      "height": 160
+    },
+    {
+      "file": "aep.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Paraguay_Space_Agency_thumbnail.original.width-1024.png",
+      "alt": "Paraguay Space Agency square",
+      "name": "Paraguayan Space Agency",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "ases.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/ASES_Logo_large.width-1024.png",
+      "alt": "The logo for the Senegalese Space Studies Agency features a shooting star above a black\u2011and\u2011white Earth, with the star\u2019s green, yellow, and red striped tail streaking across a blue sky.",
+      "name": "Senegalese Space Studies Agency (ASES)",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "aee.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Spain_Space_Agency_thumbnail_v2.original.width-1024.png",
+      "alt": "Spain Space Agency logo square",
+      "name": "Spanish Space Agency",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "tua.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/Turkish_Space_Agency_thumbnail.original.width-1024.png",
+      "alt": "Turkish Space Agency logo square",
+      "name": "Turkish Space Agency",
+      "width": 160,
+      "height": 160
+    },
+    {
+      "file": "mbrsc.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/MBRSC_LOGO.width-1024.png",
+      "alt": "MBRSC LOGO",
+      "name": "Mohammed Bin Rashid Space Centre",
+      "width": 320,
+      "height": 148
+    },
+    {
+      "file": "uksa.webp",
+      "source": "https://assets.spaceappschallenge.org/media/images/UKSA_full_transparent_logo.original.width-1024.png",
+      "alt": "UKSA logo square",
+      "name": "UK Space Agency",
+      "width": 284,
+      "height": 160
+    }
+  ],
+  "earth": {
+    "source": "https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_land.geojson",
+    "credit": "Natural Earth, public domain",
+    "description": "Orthographic dot illustration centered on 65\u00b0 E, 25\u00b0 N. Decorative orbital lines; no fire measurements."
+  }
+}

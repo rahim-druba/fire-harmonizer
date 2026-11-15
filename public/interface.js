@@ -118,7 +118,8 @@
         opening.delay(eagleIntro());
         enter(opening, '.masthead', 0, {y:mobile ? -4 : -8, duration:0.4});
         enter(opening, '.landing h1', 0.08, {duration:mobile ? 0.45 : 0.6});
-        enter(opening, '.landing .wrap > .sub', 0.16);
+        enter(opening, '.landing .intro-copy > .sub', 0.16);
+        enter(opening, '.earth-figure', 0.12, {y:12, rotation:-4, duration:0.8});
         enter(opening, '.tool-links .card', 0.22, {
           y:mobile ? 10 : 24, rotationX:mobile ? 0 : 4,
           transformPerspective:900, transformOrigin:'center bottom',
@@ -148,7 +149,7 @@
       }
     }
 
-    select('.sat-box, .narrative').forEach(element => {
+    select('.sat-box, .narrative, .agency-section').forEach(element => {
       if (element.getBoundingClientRect().top <= window.innerHeight || focused(element)) return;
       track([element]);
       const tween = gsap.from(element, {
@@ -181,6 +182,15 @@
       }
     });
     context.configureDepth();
+
+    const earth = document.querySelector('.earth-drift');
+    if (earth && !mobile) {
+      track([earth]);
+      gsap.to(earth, {
+        y:24, x:8, rotation:6, ease:'none',
+        scrollTrigger:{trigger:'.landing-intro', start:'top top', end:'bottom top', scrub:0.5}
+      });
+    }
 
     // DOM observers only decorate completed renders; they never calculate data.
     context.add('settle', element => {
