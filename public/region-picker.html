@@ -32,8 +32,10 @@
   #result .row b { font-variant-numeric: tabular-nums; }
   .hint { font-size: 11.5px; color: #6f6f80; margin-top: 16px; line-height: 1.5; }
 </style>
+<link rel="stylesheet" href="/interface.css">
+<script src="/interface.js" defer></script>
 </head>
-<body>
+<body class="region">
 <div id="map"></div>
 <div id="panel">
   <nav><a href="/">Home</a><a href="/dashboard.html">Dashboard</a></nav>
@@ -57,7 +59,7 @@
   <button id="lookupBtn" disabled>Get real-time hotspot count</button>
   <button class="secondary" id="presetBtn">Use the Kazakhstan demo region</button>
 
-  <div id="result">Draw a region to see live MODIS + VIIRS counts here.</div>
+  <div id="result" role="status" aria-live="polite">Draw a region to see live MODIS + VIIRS counts here.</div>
 
   <div class="hint">This calls <code>/api/hotspots</code> on this server, which calls NASA FIRMS directly with a server-side key — the key never reaches this page. Requires <code>FIRMS_MAP_KEY</code> set in <code>.env</code>.</div>
 </div>
@@ -67,7 +69,11 @@
 <script>
 const KAZAKHSTAN_BBOX = [46, 40, 87, 55.5]; // west, south, east, north -- same box the demo prototype uses
 
-const map = L.map('map').setView([48, 68], 4);
+const motionAllowed = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const map = L.map('map', {
+  zoomAnimation: motionAllowed(), fadeAnimation: motionAllowed(),
+  markerZoomAnimation: motionAllowed(), inertia: motionAllowed()
+}).setView([48, 68], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 18,
   attribution: '&copy; OpenStreetMap contributors'
@@ -116,7 +122,7 @@ document.getElementById('presetBtn').addEventListener('click', function () {
   const bounds = L.latLngBounds([KAZAKHSTAN_BBOX[1], KAZAKHSTAN_BBOX[0]], [KAZAKHSTAN_BBOX[3], KAZAKHSTAN_BBOX[2]]);
   const rect = L.rectangle(bounds, { color: '#e0652e' });
   drawnItems.addLayer(rect);
-  map.fitBounds(bounds);
+  map.fitBounds(bounds, { animate: motionAllowed() });
   setBboxFromLayer(rect);
 });
 

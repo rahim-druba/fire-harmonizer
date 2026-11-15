@@ -176,8 +176,10 @@ body{ margin:0; }
 .topnav a{ color:var(--muted); font-size:12.5px; text-decoration:none; margin-right:16px; }
 .topnav a:hover{ color:var(--fg); }
 </style>
+<link rel="stylesheet" href="/interface.css">
+<script src="/interface.js" defer></script>
 </head>
-<body>
+<body class="dashboard">
 
 <div class="wrap">
   <nav class="topnav"><a href="/">Home</a><a href="/region-picker.html">Region Picker</a></nav>
@@ -189,9 +191,9 @@ body{ margin:0; }
   <div class="grid">
     <div class="panel">
       <div class="cal-head">
-        <button class="btn" id="prevMonthBtn" type="button" style="padding:4px 10px;">&larr;</button>
+        <button class="btn" id="prevMonthBtn" type="button" aria-label="Previous month" style="padding:4px 10px;">&larr;</button>
         <span class="month" id="monthLabel">September 2026</span>
-        <button class="btn" id="nextMonthBtn" type="button" style="padding:4px 10px;">&rarr;</button>
+        <button class="btn" id="nextMonthBtn" type="button" aria-label="Next month" style="padding:4px 10px;">&rarr;</button>
       </div>
       <div class="sub" style="margin:-4px 0 10px;">Almaty region, KZ &middot; Sep 1 &ndash; Nov 14, 2026 (75 real days)</div>
       <div class="weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
@@ -395,7 +397,11 @@ body{ margin:0; }
         cell.className = "cal-cell" + (dk === selectedDate ? " selected" : "");
         cell.dataset.tier = tier;
         cell.setAttribute("aria-label", formatDate(dk) + ", " + tierLabel(tier) + ", " + total + " combined detections");
-        cell.addEventListener("click", function(){ selectDay(dk); });
+        cell.addEventListener("click", function(){
+          var hadFocus = document.activeElement === cell;
+          selectDay(dk);
+          if (hadFocus) document.querySelector('.cal-cell.selected').focus({preventScroll:true});
+        });
         cell.addEventListener("mouseenter", function(evt){
           showTooltip(evt, "<b>" + formatDate(dk) + "</b>" + total + " detections — " + tierLabel(tier));
         });
@@ -496,6 +502,16 @@ body{ margin:0; }
         var isSel = dk === selectedDate;
         var dot = svgEl("circle", { cx:x(idx), cy:y(total), r: isSel ? 4.5 : 2 , fill: isSel ? "var(--fg)" : "var(--series-modis)" });
         dot.style.cursor = "pointer";
+        dot.setAttribute("tabindex", "0");
+        dot.setAttribute("role", "button");
+        dot.setAttribute("aria-label", formatDate(dk) + ", " + total + " combined detections");
+        dot.addEventListener("keydown", function(event){
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectDay(dk);
+            document.querySelectorAll('#trendChart circle')[idx].focus({preventScroll:true});
+          }
+        });
         dot.addEventListener("click", function(){ selectDay(dk); });
         dot.addEventListener("mouseenter", function(evt){ showTooltip(evt, "<b>" + formatDate(dk) + "</b>" + total + " combined detections"); });
         dot.addEventListener("mousemove", function(evt){ showTooltip(evt, "<b>" + formatDate(dk) + "</b>" + total + " combined detections"); });

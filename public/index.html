@@ -15,25 +15,21 @@
   a.card .name { font-weight: 600; font-size: 14px; }
   a.card .desc { color: #9a9ab0; font-size: 12.5px; margin-top: 4px; }
   .briefing { margin: 28px 0 0; }
-  .video-still { position: relative; overflow: hidden; background: #000; aspect-ratio: 16 / 9; }
-  .video-still img { display: block; width: 100%; height: 100%; object-fit: contain; }
-  .video-title { position: absolute; inset: 0 0 auto; padding: 12px 14px 24px; background: linear-gradient(#000b, transparent); font-size: 12px; font-weight: 500; text-shadow: 0 1px 2px #000; }
-  .video-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 58px; height: 40px; border-radius: 10px; background: #e62117; }
-  .video-play svg { width: 20px; height: 20px; fill: #fff; }
-  .video-controls { position: absolute; inset: auto 0 0; padding: 20px 12px 9px; background: linear-gradient(transparent, #000d); }
-  .video-track { height: 3px; background: #ffffff60; margin-bottom: 8px; }
-  .video-track span { display: block; width: 38%; height: 100%; background: #e62117; }
-  .video-toolbar { display: flex; align-items: center; gap: 12px; color: #fff; }
-  .video-toolbar svg { width: 16px; height: 16px; fill: currentColor; }
-  .video-toolbar .still-label { margin-left: auto; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+  .shot-frame { position: relative; overflow: hidden; border: 1px solid #2a2a36; border-radius: 10px; background: #000; }
+  .shot-frame img { display: block; width: 100%; height: auto; }
+  .shot-tag { position: absolute; top: 12px; left: 12px; padding: 4px 9px; border-radius: 4px; background: #000a; color: #eee; font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase; font-weight: 600; }
   .briefing figcaption { color: #9a9ab0; font-size: 12px; line-height: 1.5; margin-top: 10px; }
 </style>
+<link rel="stylesheet" href="/interface.css">
+<script src="/interface.js" defer></script>
 </head>
-<body>
+<body class="landing">
 <div class="wrap">
+  <header class="masthead"><div class="site-mark">FIRE HARMONIZER</div><span class="edition">NASA Space Apps / 2026</span></header>
   <h1>Fire Harmonizer</h1>
   <div class="sub">NASA Space Apps 2026. This is the real, self-hosted, publicly deployed app — everything below is live, not a mockup.</div>
 
+  <div class="tool-links">
   <a class="card" href="/dashboard.html">
     <div class="name">Fire Activity Dashboard</div>
     <div class="desc">The calendar: 75 real days (Sept 1 – Nov 14, 2026) of NASA FIRMS data, MODIS-vs-VIIRS gap chart, real satellite snapshots, a real ML anomaly score, CSV export.</div>
@@ -43,23 +39,14 @@
     <div class="name">Region Picker</div>
     <div class="desc">Draw any region on a real Leaflet map, pick a date and a range, get live NASA FIRMS MODIS + VIIRS counts for it — not just the fixed Kazakhstan region.</div>
   </a>
+  </div>
 
   <figure class="briefing">
-    <div class="video-still" role="img" aria-label="Static video-style preview of the NASA Space Apps briefing, showing the NASA FIRMS map with VIIRS and MODIS hotspots. This is a still image, not a playable video.">
+    <div class="shot-frame" role="img" aria-label="Screenshot of the NASA FIRMS Advanced Mode interface, showing VIIRS and MODIS hotspot layers over a wildfire region.">
       <img src="/firms-website-still.png" alt="" />
-      <div class="video-title" aria-hidden="true">NASA Space Apps 2026 · Challenge briefing</div>
-      <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-      <div class="video-controls" aria-hidden="true">
-        <div class="video-track"><span></span></div>
-        <div class="video-toolbar">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9zm12-2v2a4 4 0 0 1 0 6v2a6 6 0 0 0 0-10z"/></svg>
-          <span class="still-label">Briefing still</span>
-          <svg viewBox="0 0 24 24"><path d="M3 3h7v2H5v5H3zm11 0h7v7h-2V5h-5zM3 14h2v5h5v2H3zm16 0h2v7h-7v-2h5z"/></svg>
-        </div>
-      </div>
+      <span class="shot-tag" aria-hidden="true">NASA FIRMS — official tool</span>
     </div>
-    <figcaption>NASA FIRMS — the tool this project builds on. Still from the official NASA Space Apps 2026 challenge briefing video.</figcaption>
+    <figcaption>NASA FIRMS — the tool this project builds on. Frame captured from the official NASA Space Apps 2026 challenge briefing video.</figcaption>
   </figure>
 </div>
 </body>
