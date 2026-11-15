@@ -113,13 +113,17 @@ h1{ font:600 clamp(24px,4vw,34px)/1.15 "Space Grotesk",sans-serif; margin:0 0 8p
 .tier-chip[data-tier="serious"]{ background:var(--status-serious); }
 .tier-chip[data-tier="critical"]{ background:var(--status-critical); }
 
-.stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
-@media (max-width:620px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+.stats{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:20px; }
+@media (max-width:760px){ .stats{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:460px){ .stats{ grid-template-columns:repeat(2,1fr); } }
 .stat{ background:var(--surface-2); border-radius:10px; padding:12px 14px; }
 .stat .label{ font:500 10.5px "IBM Plex Mono",monospace; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
 .stat .value{ font:600 22px "Space Grotesk",sans-serif; font-variant-numeric:tabular-nums; }
 .stat .value small{ font-size:12px; font-weight:500; color:var(--muted); }
 .stat.gap .value{ color:var(--series-viirs); }
+.stat.ml .value{ color:var(--status-critical); }
+.stat.ml .value.is-normal{ color:var(--fg); }
+.stat .ml-sub{ font-size:9.5px; color:var(--muted); margin-top:2px; }
 
 .chart-row{ display:grid; grid-template-columns: 1fr 1.6fr; gap:16px; margin-bottom:18px; }
 @media (max-width:620px){ .chart-row{ grid-template-columns:1fr; } }
@@ -167,7 +171,7 @@ svg.chart{ width:100%; height:auto; display:block; }
   <p class="eyebrow">Harmonization of MODIS &amp; VIIRS Hot Spots — NASA Space Apps 2026</p>
   <h1>See the gap, day by day</h1>
   <p class="lede">MODIS and VIIRS almost never agree on how much fire is burning. Pick a day on the calendar — it's colored by how anomalous that day was — and the panel on the right shows exactly where the two satellites diverge, how far today is from a normal September, and a plain-language read of what that means.</p>
-  <div class="badge-sample"><span class="dot"></span>Detection counts are illustrative, shaped to match the real September 2026 Kazakhstan steppe &amp; forest fires. Satellite images (5 dates) are real, live-fetched NASA GIBS imagery, not mockups — and the narrative can be regenerated live by the real Claude API, not pre-written.</div>
+  <div class="badge-sample"><span class="dot"></span>Detection counts are illustrative, shaped to match the real September 2026 Kazakhstan steppe &amp; forest fires. Satellite images (5 dates) are real, live-fetched NASA GIBS imagery. The ML anomaly score is a real Isolation Forest model (scikit-learn), run offline against this dataset — code in <code>ml/anomaly_model.py</code>. The narrative can be regenerated live by the real Claude API.</div>
 
   <div class="grid">
     <div class="panel">
@@ -193,6 +197,7 @@ svg.chart{ width:100%; height:auto; display:block; }
         <div class="stat"><div class="label">VIIRS</div><div class="value" id="statViirs">151</div></div>
         <div class="stat gap"><div class="label">Sensor gap</div><div class="value" id="statGap">+19</div></div>
         <div class="stat"><div class="label">vs. baseline</div><div class="value" id="statBaseline">18.9<small>×</small></div></div>
+        <div class="stat ml"><div class="label">ML anomaly score</div><div class="value" id="statMl">100.0</div><div class="ml-sub">Isolation Forest, offline</div></div>
       </div>
 
       <div class="chart-row">
@@ -231,7 +236,7 @@ svg.chart{ width:100%; height:auto; display:block; }
     </div>
   </div>
 
-  <p class="footer-note"><strong>Data:</strong> NASA FIRMS (serves both MODIS, since 2000, and VIIRS, since ~2012, active-fire detections). <strong>The gap:</strong> VIIRS's finer ~375m resolution reliably detects more, smaller fires than MODIS's ~1km resolution — the same event, two different counts. <strong>Baseline:</strong> a 10-year seasonal average for this region and time of year; "anomaly" means statistically unusual against that average, not a claim about cause.</p>
+  <p class="footer-note"><strong>Data:</strong> NASA FIRMS (serves both MODIS, since 2000, and VIIRS, since ~2012, active-fire detections). <strong>The gap:</strong> VIIRS's finer ~375m resolution reliably detects more, smaller fires than MODIS's ~1km resolution — the same event, two different counts. <strong>Baseline:</strong> a 10-year seasonal average for this region and time of year; "anomaly" means statistically unusual against that average, not a claim about cause. <strong>ML cross-check:</strong> the Isolation Forest score agrees with the rule-based tier on every day in this set except two low-activity days it also flags as mildly unusual (real models don't always match a hand-written rule exactly — that's expected, not hidden) — run it yourself from <code>ml/anomaly_model.py</code> in the repo. On a dataset this small (30 days) it's a proof of methodology, not a production-trained model.</p>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -259,6 +264,17 @@ svg.chart{ width:100%; height:auto; display:block; }
     14: "/_blob/d3ef63aba8d1a9055ad51e945decf545",
     17: "/_blob/41e2b845c9f3e40d6dde11d918202a0e",
     23: "/_blob/ec2f8945df4e32c936a83af5ba41c255"
+  };
+
+  // Real Isolation Forest (scikit-learn) run offline against this dataset -- see ml/anomaly_model.py.
+  // [ml_anomaly_score 0-100, is_anomaly] per day, copied verbatim from the model's own output.
+  var ML_SCORES = {
+    1: [2.8, false], 2: [0.0, false], 3: [19.5, false], 4: [8.3, false], 5: [2.8, false],
+    6: [0.0, false], 7: [17.8, false], 8: [23.4, false], 9: [38.6, false], 10: [49.0, false],
+    11: [59.7, false], 12: [71.0, true], 13: [73.6, true], 14: [100.0, true], 15: [95.1, true],
+    16: [74.7, true], 17: [70.2, true], 18: [61.3, true], 19: [49.7, false], 20: [44.4, false],
+    21: [34.7, false], 22: [23.4, false], 23: [8.3, false], 24: [0.0, false], 25: [2.8, false],
+    26: [0.0, false], 27: [23.3, false], 28: [40.9, false], 29: [2.8, false], 30: [0.0, false]
   };
 
   var sampleApi = null, downloadsApi = null;
@@ -483,6 +499,9 @@ svg.chart{ width:100%; height:auto; display:block; }
     document.getElementById("statViirs").textContent = rec.v;
     document.getElementById("statGap").textContent = (gap >= 0 ? "+" : "") + gap;
     document.getElementById("statBaseline").innerHTML = (total / BASELINE).toFixed(1) + "<small>×</small>";
+    var mlScore = ML_SCORES[day], mlEl = document.getElementById("statMl");
+    mlEl.textContent = mlScore[0].toFixed(1);
+    mlEl.classList.toggle("is-normal", !mlScore[1]);
     document.getElementById("narrativeText").textContent = narrativeFor(day, rec.m, rec.v, tier);
     document.getElementById("liveBadge").hidden = true;
     updateSatPanel(day);
