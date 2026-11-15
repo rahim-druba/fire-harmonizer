@@ -39,6 +39,11 @@
     const updates = new Map();
     const reveals = new Map();
     const observers = [];
+    let opening;
+    let eagle;
+    let eagleFlight;
+    let introTimeout;
+    let eagleRan = false;
     const select = selector => [...document.querySelectorAll(selector)];
     const track = elements => elements.forEach(element => targets.add(element));
 
@@ -64,9 +69,90 @@
       }, position);
     };
 
+    const finishEagle = () => {
+      clearTimeout(introTimeout);
+      eagleFlight?.kill();
+      eagle?.remove();
+      if (eagleRan) opening?.progress(1);
+    };
+    const eagleIntro = () => {
+      try {
+        const key = 'fire-harmonizer:eagle-intro:v1';
+        if (sessionStorage.getItem(key)) return 0;
+        // If storage is unavailable, keep the existing entrance without an intro.
+        sessionStorage.setItem(key, 'seen');
+        eagle = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        eagle.setAttribute('viewBox', '0 0 220 125');
+        eagle.setAttribute('class', 'eagle-intro');
+        eagle.setAttribute('aria-hidden', 'true');
+        eagle.setAttribute('focusable', 'false');
+        const fallback = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        [
+          'M103 78C83 69 63 58 45 41L13 9Q12 4 17 6L45 29L27 4Q27 0 32 3L59 32L47 4Q48 0 53 4L76 39L69 12Q70 8 74 13L92 47L91 28Q94 25 96 31L108 61L127 74Z',
+          'M113 78C97 80 79 81 63 77L40 65Q36 64 39 68L57 86L30 78Q26 79 30 83L57 99L39 96Q36 98 41 101L76 113Q90 113 111 97L141 86Z',
+          'M55 84L20 93L39 97L21 103L48 102L67 99C91 100 111 98 133 91C146 87 154 79 162 77L176 79L184 75L187 68L178 58L166 55L155 63L145 70C132 73 118 70 106 69L88 73Z',
+          'M179 63L195 68Q201 71 196 80L191 75L184 74L185 68Z'
+        ].forEach((outline, index) => {
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', outline);
+          if (index === 3) path.setAttribute('fill', 'var(--series-viirs)');
+          fallback.appendChild(path);
+        });
+        eagle.appendChild(fallback);
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        const mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
+        mask.setAttribute('id', 'falcon-intro-mask');
+        mask.setAttribute('maskUnits', 'userSpaceOnUse');
+        mask.setAttribute('x', '0');
+        mask.setAttribute('y', '0');
+        mask.setAttribute('width', '640');
+        mask.setAttribute('height', '480');
+        mask.style.maskType = 'alpha';
+        const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        image.setAttribute('width', '640');
+        image.setAttribute('height', '480');
+        image.setAttribute('transform', 'translate(640 0) scale(-1 1)');
+        const rendered = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rendered.setAttribute('width', '640');
+        rendered.setAttribute('height', '480');
+        rendered.setAttribute('mask', 'url(#falcon-intro-mask)');
+        rendered.setAttribute('visibility', 'hidden');
+        image.addEventListener('load', () => {
+          if (!eagle.isConnected || reduced.matches) return;
+          eagle.setAttribute('viewBox', '140 40 400 420');
+          fallback.setAttribute('display', 'none');
+          rendered.removeAttribute('visibility');
+        }, {once:true});
+        image.setAttribute('href', '/falcon-silhouette.png');
+        mask.appendChild(image);
+        defs.appendChild(mask);
+        eagle.appendChild(defs);
+        eagle.appendChild(rendered);
+        document.body.appendChild(eagle);
+        const width = eagle.getBoundingClientRect().width;
+        const altitude = Math.min(innerHeight * 0.3, 230);
+        eagleRan = true;
+        eagleFlight = gsap.timeline({onComplete:() => eagle.remove()});
+        eagleFlight.fromTo(eagle, {x:-width, y:altitude + 45, rotation:-5, opacity:0}, {
+          x:innerWidth * 0.56, y:altitude, rotation:0, opacity:1,
+          duration:mobile ? 0.65 : 0.8, ease:'power2.out'
+        }).to(eagle, {
+          x:innerWidth + width, y:altitude - 35, rotation:-3, opacity:0,
+          duration:0.32, ease:'power2.in'
+        });
+        return mobile ? 0.57 : 0.72;
+      } catch (error) {
+        eagleFlight?.kill();
+        eagle?.remove();
+        eagleRan = false;
+        return 0;
+      }
+    };
+
     if (!hasEntered) {
-      const opening = gsap.timeline();
+      opening = gsap.timeline();
       if (document.body.classList.contains('landing')) {
+        opening.delay(eagleIntro());
         enter(opening, '.masthead', 0, {y:mobile ? -4 : -8, duration:0.4});
         enter(opening, '.landing h1', 0.08, {duration:mobile ? 0.45 : 0.6});
         enter(opening, '.landing .wrap > .sub', 0.16);
@@ -93,6 +179,10 @@
         });
       }
       hasEntered = true;
+      if (eagleRan) {
+        introTimeout = setTimeout(finishEagle, 1800);
+        opening.eventCallback('onComplete', () => clearTimeout(introTimeout));
+      }
     }
 
     select('.sat-box, .narrative').forEach(element => {
@@ -148,11 +238,13 @@
     });
 
     const finishFocused = event => {
+      if (eagleRan && opening?.progress() < 1) finishEagle();
       targets.forEach(element => {
         if (element.contains(event.target)) finish(element);
       });
     };
     document.addEventListener('focusin', finishFocused);
+    if (eagleRan) document.addEventListener('pointerdown', finishEagle, {capture:true, once:true});
     const refresh = () => {
       cancelAnimationFrame(resizeFrame);
       resizeFrame = requestAnimationFrame(() => {
@@ -164,6 +256,10 @@
     window.addEventListener('load', refresh, {once:true});
 
     return () => {
+      clearTimeout(introTimeout);
+      eagleFlight?.kill();
+      eagle?.remove();
+      document.removeEventListener('pointerdown', finishEagle, true);
       observers.forEach(observer => observer.disconnect());
       updates.forEach(tween => tween.kill());
       targets.forEach(element => element.classList.remove('motion-entering'));

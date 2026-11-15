@@ -34,6 +34,7 @@ button:not(:disabled):active, a.card:active { transform:translateY(1px); }
 .sensor-mark { display:flex; gap:3px; flex:none; }
 .sensor-mark i { display:block; width:5px; height:20px; background:var(--series-modis); }
 .sensor-mark i:last-child { background:var(--series-viirs); }
+.eagle-intro { position:fixed; inset:0 auto auto 0; width:clamp(128px,18vw,220px); height:auto; fill:var(--fg); z-index:20; pointer-events:none; user-select:none; }
 .landing .wrap { max-width:1080px; padding:36px 28px 64px; }
 .landing .masthead { display:flex; justify-content:space-between; align-items:center; gap:20px; padding-bottom:24px; border-bottom:1px solid var(--border); margin-bottom:64px; }
 .edition { font:400 11px 'IBM Plex Mono',monospace; color:var(--muted); }
@@ -125,6 +126,7 @@ button:not(:disabled):active, a.card:active { transform:translateY(1px); }
   .region #panel { height:auto; overflow:visible; border-left:0; border-top:1px solid var(--border); padding:24px; }
 }
 @media (prefers-reduced-motion:reduce) {
+  .eagle-intro { display:none; }
   html { scroll-behavior:auto; }
   *, *::before, *::after { animation:none !important; transition:none !important; }
   button:not(:disabled):active, a.card:active, .dashboard .cal-cell:hover,
