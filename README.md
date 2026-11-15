@@ -113,6 +113,35 @@ npm start
 # open http://localhost:3000/region-picker.html
 ```
 
+### Region picker, tested live
+
+Six real draws on the actual map, run the morning of the event — different regions, different dates, each one a fresh call to NASA's live API:
+
+![Region picker showing the Kazakhstan demo region on Sept 7, 2026 — 656 MODIS, 2,647 VIIRS, 3,303 combined](screenshots/region-picker-kazakhstan-sep07.png)
+
+![Region picker showing a small hand-drawn box around Karaganda on Sept 7, 2026 — 15 MODIS, 32 VIIRS](screenshots/region-picker-karaganda-sep07.png)
+
+| Region drawn | Date | MODIS | VIIRS (NOAA-20) | Combined |
+|---|---|---|---|---|
+| Karaganda area (small, hand-drawn) | Sep 7, 2026 | 15 | 32 | 47 |
+| Kazakhstan (the demo region) | Sep 7, 2026 | 656 | 2,647 | 3,303 |
+| Kazakhstan (the demo region) | Sep 5, 2026 | 119 | 682 | 801 |
+| Kazakhstan (the demo region) | Sep 1, 2026 | 26 | 374 | 400 |
+| Aktobe area (hand-drawn) | Sep 1, 2026 | 5 | 26 | 31 |
+| Almaty / Zhambyl area (hand-drawn) | Sep 1, 2026 | 2 | 4 | 6 |
+
+The Kazakhstan rows match the prototype's own numbers exactly — same region, same dates, two separate tools independently landing on the same answer from NASA's live API. The three hand-drawn boxes are the real proof it's not locked to one hardcoded region: draw anywhere, get a real count for exactly that box, down to zero when nothing's burning there.
+
+<details>
+<summary>More screenshots</summary>
+
+![Region picker, Kazakhstan demo region, Sept 5 2026](screenshots/region-picker-kazakhstan-sep05.png)
+![Region picker, Kazakhstan demo region, Sept 1 2026](screenshots/region-picker-kazakhstan-sep01.png)
+![Region picker, a hand-drawn box around Aktobe, Sept 1 2026](screenshots/region-picker-aktobe-sep01.png)
+![Region picker, a hand-drawn box around Almaty/Zhambyl, Sept 1 2026](screenshots/region-picker-almaty-sep01.png)
+
+</details>
+
 ## Tech stack
 
 - **Frontend:** vanilla HTML/CSS/JS, hand-authored inline SVG for charts (no charting library)
