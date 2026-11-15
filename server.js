@@ -74,4 +74,9 @@ app.get('/api/hotspots', async (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Mars Survival Map running on http://localhost:${port}`));
+// Keep app.listen() for local dev (`node server.js`); Vercel imports the exported
+// app instead and never calls this branch.
+if (require.main === module) {
+  app.listen(port, () => console.log(`Fire Harmonizer server running on http://localhost:${port}`));
+}
+module.exports = app;
