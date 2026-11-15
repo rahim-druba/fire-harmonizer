@@ -49,6 +49,9 @@ Questions on judge psychology (pick 4–5, keep it conversational):
 - Sun Nov 15: 10:00–12:00 mentor sessions · 15:00–19:00 presentations/judging (5 min/team) · 20:00 winners announced (Zoom)
 - Challenges list: https://www.spaceappschallenge.org/2026/challenges/
 
+## Real ML model
+`ml/anomaly_model.py` — a real Isolation Forest (scikit-learn) fit against the 30-day dataset, run offline. Output is baked into the prototype as the "ML anomaly score" stat tile, cross-checked against the rule-based z-score tiers (they agree on the real event window). Honest framing if asked: proof of methodology on a 30-day illustrative series, not a production model trained on years of real FIRMS history — that's the obvious next step with more time.
+
 ## Real literature on the harmonization gap
 Saved in `RESEARCH.md` — Consensus AI search with real citations. Headline facts: VIIRS detects 3–6x more fire pixels than MODIS depending on region (not the ~1.2x our demo uses — mention the real range if asked), no universal correction factor exists in the literature (so our simple baseline+z-score approach is the honest choice, not a weak one), and **the brief explicitly asks for a downloadable CSV of hotspots in the search area — not built yet, highest-priority gap if there's time before presenting today.**
 
