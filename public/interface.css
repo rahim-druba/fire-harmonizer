@@ -88,11 +88,16 @@ button:not(:disabled):active, a.card:active { transform:translateY(1px); }
 .region #result .row:first-child span { color:var(--muted) !important; }
 .region #result .row b { font:500 20px 'Space Grotesk',sans-serif; }
 .region .hint { color:var(--muted); line-height:1.8; margin-top:24px; overflow-wrap:anywhere; }
-.reveal-pending { opacity:0; transform:translateY(6px); transition:opacity 280ms ease-out, transform 280ms ease-out; }
+.briefing, .sat-box, .narrative, .footer-note { transition:opacity 280ms ease-out, transform 280ms ease-out; }
+.reveal-pending { opacity:0; transform:translateY(6px); }
 .reveal-pending:focus-within { opacity:1; transform:none; transition:none; }
+.landing a.card:focus-visible { background:var(--surface-2); color:var(--series-modis); border-color:var(--series-modis); }
+.landing a.card:focus-visible::after { transform:translate(4px,-4px); color:var(--series-modis); }
 @media (hover:hover) {
-  .landing a.card:hover { background:transparent; color:var(--series-modis); }
-  .landing a.card:hover::after { transform:translate(2px,-2px); }
+  .landing a.card:hover { background:var(--surface-2); color:var(--series-modis); border-color:var(--series-modis); transform:translateY(-3px); }
+  .landing a.card:hover::after { transform:translate(4px,-4px); color:var(--series-modis); }
+  .landing a.card:active { transform:translateY(1px); }
+  .dashboard .btn:not(:disabled):hover { border-color:var(--fg); }
   .dashboard .cal-cell:not(.no-data):not(.empty):hover { transform:translateY(-2px); }
   .dashboard .cal-cell { transition:transform 140ms; }
   .region button:not(:disabled):hover { opacity:.88; }
@@ -123,5 +128,6 @@ button:not(:disabled):active, a.card:active { transform:translateY(1px); }
   *, *::before, *::after { animation:none !important; transition:none !important; }
   .reveal-pending { opacity:1; transform:none; }
   button:not(:disabled):active, a.card:active, .dashboard .cal-cell:hover,
-  .landing a.card:hover::after { transform:none; }
+  .landing a.card:hover, .landing a.card:hover::after,
+  .landing a.card:focus-visible::after { transform:none; }
 }
