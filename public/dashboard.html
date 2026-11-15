@@ -148,7 +148,6 @@ svg.chart{ width:100%; height:auto; display:block; }
   font-size:13.5px; line-height:1.6;
 }
 .narrative .who{ font:600 10.5px "IBM Plex Mono",monospace; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px; display:block; }
-.live-badge{ font:600 9.5px "IBM Plex Mono",monospace; text-transform:uppercase; letter-spacing:.05em; color:var(--series-modis); margin-left:8px; }
 
 .btn{
   font:600 11.5px "Inter",sans-serif; border:1px solid var(--border); background:var(--surface);
@@ -185,7 +184,7 @@ body{ margin:0; }
   <p class="eyebrow">Harmonization of MODIS &amp; VIIRS Hot Spots — NASA Space Apps 2026</p>
   <h1>See the gap, day by day</h1>
   <p class="lede">MODIS and VIIRS almost never agree on how much fire is burning. Browse Sept 1 - Nov 14, 2026 — each day is colored by how anomalous it was — and the panel on the right shows exactly where the two satellites diverge, how far that day is from typical, and a plain-language read of what that means.</p>
-  <div class="badge-sample"><span class="tag">What's actually real here</span>Every MODIS/VIIRS detection count below is real — pulled live from NASA FIRMS (MODIS NRT + VIIRS NOAA-20 NRT) with a personal API key, Sept 1 - Nov 14 2026 (75 real days, the NRT retention window), Kazakhstan bounding box. Satellite images (6 dates) are real, live-fetched NASA GIBS imagery. The ML anomaly score is a real Isolation Forest model (scikit-learn) run against this data — code in <code>ml/anomaly_model.py</code>. The narrative can be regenerated live by the real Claude API.</div>
+  <div class="badge-sample"><span class="tag">What's actually real here</span>Every MODIS/VIIRS detection count below is real — pulled live from NASA FIRMS (MODIS NRT + VIIRS NOAA-20 NRT) with a personal API key, Sept 1 - Nov 14 2026 (75 real days, the NRT retention window), Kazakhstan bounding box. Satellite images (6 dates) are real, live-fetched NASA GIBS imagery. The ML anomaly score is a real Isolation Forest model (scikit-learn) run against this data — code in <code>ml/anomaly_model.py</code>.</div>
 
   <div class="grid">
     <div class="panel">
@@ -244,12 +243,11 @@ body{ margin:0; }
       </div>
 
       <div class="btn-row">
-        <button class="btn" id="askClaudeBtn" type="button">Ask Claude live</button>
         <button class="btn" id="csvBtn" type="button">Download CSV (Sept-Nov)</button>
       </div>
 
       <div class="narrative">
-        <span class="who">Claude — plain-language read<span class="live-badge" id="liveBadge" hidden>live</span></span>
+        <span class="who">Plain-language read</span>
         <span id="narrativeText">Loading…</span>
       </div>
     </div>
@@ -324,12 +322,6 @@ body{ margin:0; }
     "2026-11-05": [15.9, false], "2026-11-06": [22.5, false], "2026-11-07": [24.6, false], "2026-11-08": [17.6, false], "2026-11-09": [21.3, false],
     "2026-11-10": [26.4, false], "2026-11-11": [41.3, true], "2026-11-12": [35.2, true], "2026-11-13": [36.2, true], "2026-11-14": [41.0, true]
   };
-
-  var sampleApi = null, downloadsApi = null;
-  if (window.claude && window.claude.use) {
-    window.claude.use("sample").then(function(api){ sampleApi = api; }).catch(function(){});
-    window.claude.use("downloads").then(function(api){ downloadsApi = api; }).catch(function(){});
-  }
 
   function tierFor(total){
     var ratio = total / BASELINE;
@@ -527,33 +519,6 @@ body{ margin:0; }
     }
   }
 
-  function askClaudeLive(){
-    var btn = document.getElementById("askClaudeBtn");
-    var badge = document.getElementById("liveBadge");
-    var narrativeEl = document.getElementById("narrativeText");
-    var dk = selectedDate, rec = DATA[dk], total = rec.m + rec.v, tier = tierFor(total);
-    if (!sampleApi) {
-      narrativeEl.textContent = "Live Claude call isn't available in this view. " + narrativeFor(dk, rec.m, rec.v, tier);
-      return;
-    }
-    btn.disabled = true; btn.textContent = "Asking Claude…";
-    var prompt = "You are writing a plain-language read of a real satellite fire-detection count for a NASA Space Apps demo, for a fire manager (not a scientist). "
-      + "Region: Kazakhstan (country-wide bounding box). Date: " + formatDate(dk) + ". "
-      + "Real MODIS detections (NASA FIRMS): " + rec.m + ". Real VIIRS NOAA-20 detections: " + rec.v + ". "
-      + "Median daily total across the real 75-day Sept-Nov 2026 window (used as a baseline proxy, not a multi-year climatology): " + BASELINE + ". "
-      + "Anomaly tier: " + tierLabel(tier) + ". "
-      + "Write exactly 1-2 sentences. No disclaimers, no markdown, no restating the raw numbers back verbatim.";
-    sampleApi(prompt).then(function(res){
-      if (dk !== selectedDate) return;
-      narrativeEl.textContent = res.text;
-      badge.hidden = false;
-    }).catch(function(err){
-      narrativeEl.textContent = "Claude call failed (" + ((err && err.code) || "unknown") + "). " + narrativeFor(dk, rec.m, rec.v, tier);
-    }).then(function(){
-      btn.disabled = false; btn.textContent = "Ask Claude live";
-    });
-  }
-
   function downloadCsv(){
     var btn = document.getElementById("csvBtn");
     var rows = ["date,modis,viirs,combined,gap,tier,ratio_vs_baseline"];
@@ -562,17 +527,17 @@ body{ margin:0; }
       rows.push([dk, rec.m, rec.v, total, gap, tierLabel(tier), (total / BASELINE).toFixed(2)].join(","));
     }
     var csv = rows.join("\n");
-    if (!downloadsApi) {
-      btn.textContent = "Not available in this view";
-      setTimeout(function(){ btn.textContent = "Download CSV (Sept-Nov)"; }, 2200);
-      return;
-    }
-    btn.disabled = true; btn.textContent = "Saving…";
-    downloadsApi.save({ filename: "hotspots_sep_nov_2026.csv", data: csv })
-      .catch(function(){ btn.textContent = "Save declined"; })
-      .then(function(){
-        setTimeout(function(){ btn.disabled = false; btn.textContent = "Download CSV (Sept-Nov)"; }, 1200);
-      });
+    var blob = new Blob([csv], { type: "text/csv" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "hotspots_sep_nov_2026.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    btn.textContent = "Saved";
+    setTimeout(function(){ btn.textContent = "Download CSV (Sept-Nov)"; }, 1600);
   }
 
   function selectDay(dk){
@@ -591,7 +556,6 @@ body{ margin:0; }
     mlEl.textContent = mlScore[0].toFixed(1);
     mlEl.classList.toggle("is-normal", !mlScore[1]);
     document.getElementById("narrativeText").textContent = narrativeFor(dk, rec.m, rec.v, tier);
-    document.getElementById("liveBadge").hidden = true;
     updateSatPanel(dk);
     buildBarChart(rec.m, rec.v);
     // Jump the calendar's visible month to match the selected date (so clicking a trend-chart
@@ -601,7 +565,6 @@ body{ margin:0; }
     buildTrendChart();
   }
 
-  document.getElementById("askClaudeBtn").addEventListener("click", askClaudeLive);
   document.getElementById("csvBtn").addEventListener("click", downloadCsv);
   document.getElementById("prevMonthBtn").addEventListener("click", function(){ changeMonth(-1); });
   document.getElementById("nextMonthBtn").addEventListener("click", function(){ changeMonth(1); });
