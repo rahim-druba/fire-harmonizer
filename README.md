@@ -102,12 +102,13 @@ pip install -r requirements.txt
 python3 anomaly_model.py
 ```
 
-The Express scaffold (`server.js`) is from an earlier challenge direction and calls the Claude API server-side:
+The Express backend (`server.js`) also serves a **real-time Leaflet region picker** at `/region-picker.html` — draw a rectangle on a real OpenStreetMap map, pick a date, and it calls NASA FIRMS live through a server-side key (never exposed to the browser) for real MODIS + VIIRS counts in that exact region. This has to run as a real served page, not the claude.ai artifact above, because the artifact's sandbox blocks the external map tile images Leaflet needs.
 
 ```bash
 npm install
-cp .env.example .env   # add your own ANTHROPIC_API_KEY
+cp .env.example .env   # add your own ANTHROPIC_API_KEY and FIRMS_MAP_KEY
 npm start
+# open http://localhost:3000/region-picker.html
 ```
 
 ## Tech stack
@@ -138,9 +139,10 @@ What we report instead is **agreement between two independently-designed methods
 ## Roadmap
 
 - [x] Swap the illustrative MODIS/VIIRS counts for a real NASA FIRMS API pull
+- [x] Real-time region picker (Leaflet + live FIRMS lookup via the Express backend)
 - [ ] Pull multi-year FIRMS history to replace the within-month median with a real seasonal climatology
-- [ ] Wire the map/calendar picker to an arbitrary region, not a fixed Kazakhstan bounding box
-- [ ] Deploy the Express backend so the harmonization + anomaly pipeline runs server-side on live data
+- [ ] Wire the region picker's live counts into the calendar/prototype view, instead of the two living separately
+- [ ] Deploy the Express backend publicly so the region picker works outside `localhost`
 
 ## Built for
 
