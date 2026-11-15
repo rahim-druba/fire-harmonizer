@@ -186,7 +186,7 @@ text{ fill: var(--fg); font-family: "Inter", sans-serif; }
           <rect class="box" x="535" y="90" width="140" height="70" rx="10"/>
           <text x="609" y="113" text-anchor="middle" font-weight="600" font-size="12">Baseline +</text>
           <text x="609" y="130" text-anchor="middle" font-weight="600" font-size="12">Anomaly Engine</text>
-          <text class="muted-text" x="609" y="148" text-anchor="middle" font-size="8.5">z-score vs 10yr season</text>
+          <text class="muted-text" x="609" y="148" text-anchor="middle" font-size="8.5">z-score + Isolation Forest (ML)</text>
 
           <!-- box 4: Claude Narrative Layer -->
           <rect x="705" y="90" width="4" height="70" fill="var(--claude)"/>
@@ -277,6 +277,6 @@ text{ fill: var(--fg); font-family: "Inter", sans-serif; }
     <div class="legend-item"><span class="swatch" style="background:var(--muted)"></span>Shared / external: data sources, UI shell</div>
   </div>
 
-  <p class="footer-note">Data source: <strong>NASA FIRMS</strong> (Fire Information for Resource Management System), which already serves both MODIS and VIIRS active-fire detections — our harmonization layer is the normalization step on top of that, not a new sensor calibration. Local validation case: the September 2026 Kazakhstan steppe and forest fires (~2,870 ha).</p>
+  <p class="footer-note">Data source: <strong>NASA FIRMS</strong> (Fire Information for Resource Management System), which already serves both MODIS and VIIRS active-fire detections — our harmonization layer is the normalization step on top of that, not a new sensor calibration. <strong>Anomaly engine:</strong> a transparent seasonal z-score, cross-checked against a real Isolation Forest model (scikit-learn, <code>ml/anomaly_model.py</code>) run offline — two independent methods agreeing is the validation, not a single black-box score. Local validation case: the September 2026 Kazakhstan steppe and forest fires (~2,870 ha).</p>
 
 </div>
