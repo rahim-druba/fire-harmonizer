@@ -43,8 +43,9 @@ button:not(:disabled):active, a.card:active { transform:translateY(1px); }
 .landing a.card .name { font:600 21px/1.3 'Space Grotesk',sans-serif; }
 .landing a.card .desc { font-size:13px; line-height:1.75; color:var(--muted); margin-top:12px; max-width:47ch; }
 .landing .briefing { margin-top:48px; padding-top:24px; border-top:1px solid var(--border); }
-.landing .shot-frame { max-width:760px; border-radius:4px; border-color:var(--border); }
-.landing .briefing figcaption { color:var(--muted); max-width:70ch; line-height:1.7; }
+.landing .shot-frame { max-width:760px; aspect-ratio:2 / 1; border-radius:4px; border-color:var(--border); }
+.landing .shot-frame img { height:100%; object-fit:cover; object-position:top; }
+.landing .briefing figcaption { color:var(--muted); max-width:70ch; font-size:10px; line-height:1.5; margin-top:6px; }
 .dashboard { padding-block:32px 64px; }
 .dashboard .wrap { max-width:1200px; }
 .topnav { display:flex; align-items:center; gap:24px; border-bottom:1px solid var(--border); padding-bottom:18px; margin-bottom:32px; }
