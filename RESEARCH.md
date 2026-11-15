@@ -1,6 +1,6 @@
-# Harmonization research — Consensus AI summary (saved 2026-11-15)
+# Harmonization research notes
 
-Source: Consensus AI literature search on MODIS/VIIRS active-fire harmonization, run against the actual NASA Space Apps challenge brief. Full citations below each claim.
+Literature review on MODIS/VIIRS active-fire harmonization, read against the actual NASA Space Apps challenge brief. Full citations below each claim.
 
 ## What the brief actually asks for (quoted from the brief itself)
 - Build a web app that harmonizes MODIS + VIIRS hotspot records into a **burning activity calendar**, so sensor of origin no longer matters to the user.
