@@ -28,14 +28,14 @@ Fire managers, researchers, and emergency responders are left without one consis
 | **[Fire Harmonizer Prototype](https://claude.ai/artifact/4mLbtg7VCFqEqd3JJ58EED)** | The interactive product — severity-colored calendar, MODIS-vs-VIIRS gap chart, 30-day trend, real NASA satellite snapshots, a live Claude-generated narrative, a real ML anomaly score, and CSV export |
 | **[Architecture diagrams](https://claude.ai/artifact/GTXE5hpJBJT8VVf31PXvD4)** | How data actually moves: satellite → harmonization → anomaly engine → narrative, and who calls whom over the network |
 
-Both links are currently private to the author — ask for access if you're reviewing this as a judge or collaborator.
+Both links are shared as "anyone with the link."
 
 ## What it actually does
 
 - **Calendar view** — every day of the month colored by anomaly severity (normal → elevated → high → critical), click any day to drill in.
 - **The gap, made explicit** — a direct MODIS-vs-VIIRS bar chart and a "sensor gap" stat for the selected day, so the harmonization problem is something you point at, not just explain.
-- **Seasonal baseline + anomaly flagging** — a transparent z-score against a 10-year seasonal average, not a black-box correction factor (the literature says no universal one exists — see [`RESEARCH.md`](RESEARCH.md)).
-- **A real ML cross-check** — an Isolation Forest model (scikit-learn), run against the same series, independently flags the same event window.
+- **Baseline + anomaly flagging** — a transparent ratio against this month's own median day (a robust proxy baseline), not a black-box correction factor (the literature says no universal one exists — see [`RESEARCH.md`](RESEARCH.md)).
+- **A real ML cross-check** — an Isolation Forest model (scikit-learn), run against the real data, independently flags the same Sept 6–8 spike.
 - **Real satellite imagery** — live NASA GIBS snapshots (MODIS true-color + fire-detection overlay) for key dates, not illustrations.
 - **A live AI narrative** — a plain-language read of each day's anomaly, generated on demand by a real call to Claude, not pre-written copy.
 - **CSV export** — download the full month of detections, counts, and anomaly tiers.
@@ -46,12 +46,14 @@ Being upfront about this is part of the project, not an afterthought:
 
 | Component | Status |
 |---|---|
-| Satellite imagery (5 dates) | **Real** — fetched live from NASA GIBS |
+| MODIS/VIIRS daily detection counts | **Real** — pulled live from NASA FIRMS (MODIS NRT + VIIRS NOAA-20 NRT) with a personal API key, September 2026, over a bounding box covering all of Kazakhstan |
+| Satellite imagery (6 dates) | **Real** — fetched live from NASA GIBS |
 | Live Claude narrative | **Real** — actual API call, generated on demand |
-| ML anomaly score | **Real model** (Isolation Forest, scikit-learn), run on the demo's own illustrative series — proof of methodology, not a production model trained on years of FIRMS history |
+| ML anomaly score | **Real model** (Isolation Forest, scikit-learn), run on the real FIRMS data above |
 | CSV export mechanism | **Real** |
-| MODIS/VIIRS daily detection counts | **Illustrative** — hand-shaped to match the real event's reported severity pattern, not pulled from the live FIRMS API (that needs a personal API key — see Roadmap) |
-| The underlying event (Sept 2026 Kazakhstan steppe & forest fires, ~2,870 ha) | **Real**, reported in local news |
+| Baseline | **Real but approximate** — this month's own median daily total (753), used as an honest proxy; a true multi-year seasonal climatology needs a multi-year FIRMS pull we didn't have time for |
+| Scope of the counts | The bounding box is country-wide, so the numbers are Kazakhstan's *total* fire signal that month (wildfires + agricultural burning), not isolated to one event |
+| The underlying event (Sept 2026 Kazakhstan steppe & forest fires, ~2,870 ha) | **Real**, reported in local news — part of, not identical to, the real Sept 6–8 spike in the data |
 
 ## The local case study
 
@@ -79,6 +81,8 @@ Full diagrams (data pipeline + request flow, with network hops numbered) are in 
 ├── ml/
 │   ├── anomaly_model.py        # Real Isolation Forest anomaly model (scikit-learn)
 │   └── requirements.txt
+├── data/
+│   └── firms_kazakhstan_sept2026.csv  # Real daily MODIS/VIIRS counts pulled from NASA FIRMS
 ├── server.js                   # Express scaffold (Claude API kept server-side)
 ├── public/index.html           # Earlier challenge direction (Mars landing-site map), kept for reference
 ├── RESEARCH.md                 # Literature review on MODIS/VIIRS harmonization, fully cited
@@ -120,9 +124,9 @@ npm start
 
 ## Roadmap
 
-- [ ] Swap the illustrative MODIS/VIIRS counts for a real NASA FIRMS API pull (needs a free personal API key)
-- [ ] Retrain the anomaly model on multi-year real FIRMS history instead of the 30-day demo series
-- [ ] Wire the map/calendar picker to an arbitrary region, not a fixed Kazakhstan view
+- [x] Swap the illustrative MODIS/VIIRS counts for a real NASA FIRMS API pull
+- [ ] Pull multi-year FIRMS history to replace the within-month median with a real seasonal climatology
+- [ ] Wire the map/calendar picker to an arbitrary region, not a fixed Kazakhstan bounding box
 - [ ] Deploy the Express backend so the harmonization + anomaly pipeline runs server-side on live data
 
 ## Built for

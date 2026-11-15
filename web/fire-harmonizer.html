@@ -171,7 +171,7 @@ svg.chart{ width:100%; height:auto; display:block; }
   <p class="eyebrow">Harmonization of MODIS &amp; VIIRS Hot Spots — NASA Space Apps 2026</p>
   <h1>See the gap, day by day</h1>
   <p class="lede">MODIS and VIIRS almost never agree on how much fire is burning. Pick a day on the calendar — it's colored by how anomalous that day was — and the panel on the right shows exactly where the two satellites diverge, how far today is from a normal September, and a plain-language read of what that means.</p>
-  <div class="badge-sample"><span class="dot"></span>Detection counts are illustrative, shaped to match the real September 2026 Kazakhstan steppe &amp; forest fires. Satellite images (5 dates) are real, live-fetched NASA GIBS imagery. The ML anomaly score is a real Isolation Forest model (scikit-learn), run offline against this dataset — code in <code>ml/anomaly_model.py</code>. The narrative can be regenerated live by the real Claude API.</div>
+  <div class="badge-sample"><span class="dot"></span>Every MODIS/VIIRS detection count below is real — pulled live from NASA FIRMS (MODIS NRT + VIIRS NOAA-20 NRT) with a personal API key, September 2026, Kazakhstan bounding box. Satellite images (6 dates) are real, live-fetched NASA GIBS imagery. The ML anomaly score is a real Isolation Forest model (scikit-learn) run against this data — code in <code>ml/anomaly_model.py</code>. The narrative can be regenerated live by the real Claude API.</div>
 
   <div class="grid">
     <div class="panel">
@@ -188,15 +188,15 @@ svg.chart{ width:100%; height:auto; display:block; }
 
     <div class="panel">
       <div class="detail-top">
-        <span class="date" id="detailDate">September 14, 2026</span>
+        <span class="date" id="detailDate">September 7, 2026</span>
         <span class="tier-chip" id="detailTier">critical</span>
       </div>
 
       <div class="stats">
-        <div class="stat"><div class="label">MODIS</div><div class="value" id="statModis">132</div></div>
-        <div class="stat"><div class="label">VIIRS</div><div class="value" id="statViirs">151</div></div>
-        <div class="stat gap"><div class="label">Sensor gap</div><div class="value" id="statGap">+19</div></div>
-        <div class="stat"><div class="label">vs. baseline</div><div class="value" id="statBaseline">18.9<small>×</small></div></div>
+        <div class="stat"><div class="label">MODIS</div><div class="value" id="statModis">656</div></div>
+        <div class="stat"><div class="label">VIIRS</div><div class="value" id="statViirs">2647</div></div>
+        <div class="stat gap"><div class="label">Sensor gap</div><div class="value" id="statGap">+1991</div></div>
+        <div class="stat"><div class="label">vs. median day</div><div class="value" id="statBaseline">4.4<small>×</small></div></div>
         <div class="stat ml"><div class="label">ML anomaly score</div><div class="value" id="statMl">100.0</div><div class="ml-sub">Isolation Forest, offline</div></div>
       </div>
 
@@ -212,7 +212,7 @@ svg.chart{ width:100%; height:auto; display:block; }
         </div>
         <div class="chart-box">
           <h3>30-day detection trend</h3>
-          <p class="chart-sub">Combined detections, dashed line = seasonal baseline (15/day). Selected day marked.</p>
+          <p class="chart-sub">Combined detections, dashed line = this month's median day (753). Selected day marked.</p>
           <svg class="chart" id="trendChart" viewBox="0 0 420 170"></svg>
         </div>
       </div>
@@ -221,7 +221,7 @@ svg.chart{ width:100%; height:auto; display:block; }
         <h3>Satellite snapshot, this day</h3>
         <p class="chart-sub">Real NASA GIBS imagery (MODIS true-color + fire-detection overlay) fetched live for this exact date — not a mockup.</p>
         <img class="sat-img" id="satImg" src="" alt="" hidden>
-        <div class="sat-missing" id="satMissing">No satellite snapshot fetched for this day in this prototype — we pulled 5 real dates (Sep 1, 9, 14, 17, 23) to keep the file small. Pick one of those days to see it.</div>
+        <div class="sat-missing" id="satMissing">No satellite snapshot fetched for this day in this prototype — we pulled 6 real dates (Sep 1, 7, 9, 14, 17, 23) to keep the file small. Pick one of those days to see it.</div>
       </div>
 
       <div class="btn-row">
@@ -236,7 +236,7 @@ svg.chart{ width:100%; height:auto; display:block; }
     </div>
   </div>
 
-  <p class="footer-note"><strong>Data:</strong> NASA FIRMS (serves both MODIS, since 2000, and VIIRS, since ~2012, active-fire detections). <strong>The gap:</strong> VIIRS's finer ~375m resolution reliably detects more, smaller fires than MODIS's ~1km resolution — the same event, two different counts. <strong>Baseline:</strong> a 10-year seasonal average for this region and time of year; "anomaly" means statistically unusual against that average, not a claim about cause. <strong>ML cross-check:</strong> the Isolation Forest score agrees with the rule-based tier on every day in this set except two low-activity days it also flags as mildly unusual (real models don't always match a hand-written rule exactly — that's expected, not hidden) — run it yourself from <code>ml/anomaly_model.py</code> in the repo. On a dataset this small (30 days) it's a proof of methodology, not a production-trained model.</p>
+  <p class="footer-note"><strong>Data:</strong> NASA FIRMS, live API, MODIS NRT (since 2000) + VIIRS NOAA-20 NRT (not the retired Suomi NPP feed — Suomi NPP stopped delivering data Nov 2, 2026) active-fire detections, September 2026, over a bounding box covering all of Kazakhstan. <strong>The gap:</strong> VIIRS's finer ~375m resolution reliably detects more, smaller fires than MODIS's ~1km resolution — on the real peak day (Sep 7) that's 656 MODIS detections vs. 2,647 VIIRS, the same country, the same week. <strong>Baseline:</strong> this month's own median daily total (753), used as an honest proxy — a true multi-year seasonal climatology needs a multi-year FIRMS pull we didn't have time for. <strong>Scope note:</strong> this is the whole country's fire signal for the month (wildfires and agricultural burning together), not just the one reported steppe-fire event — Sept 6-8 is the real spike in the actual satellite record. <strong>ML cross-check:</strong> an Isolation Forest (scikit-learn) run on this same real data independently flags the same Sept 6-8 window as anomalous — run it yourself from <code>ml/anomaly_model.py</code> in the repo.</p>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -244,37 +244,42 @@ svg.chart{ width:100%; height:auto; display:block; }
 <script>
 (function(){
   "use strict";
+  // Real NASA FIRMS detections (MODIS NRT + VIIRS NOAA-20 NRT), Kazakhstan bounding box
+  // (46,40 to 87,55.5), pulled live via a personal FIRMS API key, September 2026.
   var DATA = {
-    1:{m:5,v:8}, 2:{m:6,v:9}, 3:{m:4,v:7}, 4:{m:7,v:10}, 5:{m:5,v:8},
-    6:{m:6,v:9}, 7:{m:8,v:11}, 8:{m:9,v:13}, 9:{m:14,v:19}, 10:{m:22,v:29},
-    11:{m:35,v:44}, 12:{m:58,v:70}, 13:{m:89,v:104}, 14:{m:132,v:151}, 15:{m:118,v:140},
-    16:{m:95,v:112}, 17:{m:61,v:75}, 18:{m:38,v:47}, 19:{m:24,v:31}, 20:{m:17,v:22},
-    21:{m:12,v:16}, 22:{m:9,v:13}, 23:{m:7,v:10}, 24:{m:6,v:9}, 25:{m:5,v:8},
-    26:{m:6,v:9}, 27:{m:5,v:7}, 28:{m:4,v:6}, 29:{m:5,v:8}, 30:{m:6,v:9}
+    1:{m:26,v:374}, 2:{m:57,v:560}, 3:{m:163,v:755}, 4:{m:97,v:605}, 5:{m:119,v:682},
+    6:{m:463,v:1721}, 7:{m:656,v:2647}, 8:{m:418,v:1284}, 9:{m:124,v:598}, 10:{m:162,v:844},
+    11:{m:177,v:854}, 12:{m:130,v:825}, 13:{m:59,v:456}, 14:{m:86,v:624}, 15:{m:114,v:548},
+    16:{m:44,v:293}, 17:{m:23,v:348}, 18:{m:70,v:508}, 19:{m:94,v:520}, 20:{m:152,v:632},
+    21:{m:135,v:495}, 22:{m:110,v:513}, 23:{m:142,v:786}, 24:{m:119,v:677}, 25:{m:112,v:571},
+    26:{m:151,v:468}, 27:{m:160,v:635}, 28:{m:201,v:870}, 29:{m:225,v:898}, 30:{m:339,v:1102}
   };
-  var BASELINE = 15;
+  // Baseline is this month's own median daily total (753) -- a robust proxy, not a true
+  // 10-year seasonal climatology (that needs a multi-year FIRMS pull we didn't have time for).
+  var BASELINE = 753;
   var MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   var YEAR = 2026, MONTH_INDEX = 8; // September
   var daysInMonth = 30;
 
-  // Real NASA GIBS snapshots (MODIS true-color + fire overlay), fetched live for these 5 dates.
+  // Real NASA GIBS snapshots (MODIS true-color + fire overlay), fetched live for these 6 dates.
   var SAT_IMAGES = {
     1: "/_blob/ad8c401ea036d442a7fc8d6564716e20",
+    7: "/_blob/8b6d506a439df4fff1d3329db94f9e5c",
     9: "/_blob/fdc856fc7344043f93fd291b7b7f1256",
     14: "/_blob/d3ef63aba8d1a9055ad51e945decf545",
     17: "/_blob/41e2b845c9f3e40d6dde11d918202a0e",
     23: "/_blob/ec2f8945df4e32c936a83af5ba41c255"
   };
 
-  // Real Isolation Forest (scikit-learn) run offline against this dataset -- see ml/anomaly_model.py.
-  // [ml_anomaly_score 0-100, is_anomaly] per day, copied verbatim from the model's own output.
+  // Real Isolation Forest (scikit-learn) run offline against the real FIRMS dataset above --
+  // see ml/anomaly_model.py. [ml_anomaly_score 0-100, is_anomaly] per day, copied verbatim.
   var ML_SCORES = {
-    1: [2.8, false], 2: [0.0, false], 3: [19.5, false], 4: [8.3, false], 5: [2.8, false],
-    6: [0.0, false], 7: [17.8, false], 8: [23.4, false], 9: [38.6, false], 10: [49.0, false],
-    11: [59.7, false], 12: [71.0, true], 13: [73.6, true], 14: [100.0, true], 15: [95.1, true],
-    16: [74.7, true], 17: [70.2, true], 18: [61.3, true], 19: [49.7, false], 20: [44.4, false],
-    21: [34.7, false], 22: [23.4, false], 23: [8.3, false], 24: [0.0, false], 25: [2.8, false],
-    26: [0.0, false], 27: [23.3, false], 28: [40.9, false], 29: [2.8, false], 30: [0.0, false]
+    1: [28.5, false], 2: [9.2, false], 3: [10.4, false], 4: [2.5, false], 5: [3.7, false],
+    6: [73.3, true], 7: [100.0, true], 8: [56.5, true], 9: [0.0, false], 10: [10.9, false],
+    11: [13.3, false], 12: [12.5, false], 13: [18.4, false], 14: [5.4, false], 15: [0.6, false],
+    16: [44.2, true], 17: [30.7, true], 18: [10.6, false], 19: [1.3, false], 20: [3.6, false],
+    21: [7.3, false], 22: [1.8, false], 23: [9.1, false], 24: [3.7, false], 25: [0.4, false],
+    26: [14.4, false], 27: [5.1, false], 28: [16.2, false], 29: [22.7, false], 30: [48.9, true]
   };
 
   var sampleApi = null, downloadsApi = null;
@@ -284,26 +289,27 @@ svg.chart{ width:100%; height:auto; display:block; }
   }
 
   function tierFor(total){
-    if (total > 90) return "critical";
-    if (total > 45) return "serious";
-    if (total > 20) return "warning";
+    var ratio = total / BASELINE;
+    if (ratio > 2.2) return "critical";
+    if (ratio > 1.5) return "serious";
+    if (ratio > 1.1) return "warning";
     return "good";
   }
   function tierLabel(t){
     return { good:"normal", warning:"elevated", serious:"high", critical:"critical" }[t];
   }
   function narrativeFor(day, m, v, tier){
-    var total = m + v, ratio = (total / BASELINE).toFixed(1);
-    if (day === 14) {
-      return "Peak day of the event. Combined MODIS+VIIRS detections (" + total + ") are about " + ratio + "x the seasonal baseline for this region — consistent with the September 2026 Kazakhstan steppe and forest fire event, which burned an estimated 2,870 hectares over its full duration.";
+    var total = m + v, ratio = (total / BASELINE).toFixed(2);
+    if (day === 7) {
+      return "The real peak day in this month's actual FIRMS data (" + total + " combined detections, " + ratio + "x this month's median day). This bounding box covers all of Kazakhstan, so it's the country's total fire signal that week, not one isolated fire — the real September 2026 steppe and forest fire event (~2,870 ha) is part of this, alongside other burning.";
     }
-    if (tier === "critical") return "Well above the seasonal baseline (" + ratio + "x this day). Consistent with an actively spreading fire event in this region — this is not sensor noise.";
-    if (tier === "serious") return "Elevated and moving fast (" + ratio + "x baseline). Worth watching the next couple of satellite passes before calling it confirmed.";
-    if (tier === "warning") return "Mildly above the seasonal baseline (" + ratio + "x). Could be ordinary seasonal variability, or an early signal — not an anomaly on its own.";
-    return "Within the normal range for this region and time of year (" + ratio + "x baseline).";
+    if (tier === "critical") return "Well above this month's typical day (" + ratio + "x). Real satellite detections, not a simulated spike.";
+    if (tier === "serious") return "Elevated (" + ratio + "x the month's median). Worth a closer look at this specific date.";
+    if (tier === "warning") return "Mildly above typical (" + ratio + "x). Could be ordinary day-to-day variability — not an anomaly on its own.";
+    return "Within the normal range for this region this month (" + ratio + "x the median day).";
   }
 
-  var selectedDay = 14;
+  var selectedDay = 7;
   var tooltipEl = document.getElementById("tooltip");
 
   function showTooltip(evt, html){
@@ -397,7 +403,9 @@ svg.chart{ width:100%; height:auto; display:block; }
     svg.innerHTML = "";
     var W = 420, H = 170, left = 10, right = 10, top = 14, bottom = 26;
     var plotW = W - left - right, plotH = H - top - bottom;
-    var maxVal = 300;
+    var maxVal = 0;
+    for (var dm = 1; dm <= daysInMonth; dm++) maxVal = Math.max(maxVal, DATA[dm].m + DATA[dm].v);
+    maxVal *= 1.1;
     function x(day){ return left + ((day - 1) / (daysInMonth - 1)) * plotW; }
     function y(val){ return top + plotH - (val / maxVal) * plotH; }
 
@@ -449,10 +457,10 @@ svg.chart{ width:100%; height:auto; display:block; }
       return;
     }
     btn.disabled = true; btn.textContent = "Asking Claude…";
-    var prompt = "You are writing a plain-language read of a satellite fire-detection anomaly for a NASA Space Apps demo, for a fire manager (not a scientist). "
-      + "Region: Almaty region, Kazakhstan. Date: September " + day + ", 2026. "
-      + "MODIS detections: " + rec.m + ". VIIRS detections: " + rec.v + ". "
-      + "10-year seasonal baseline for this region/time of year: " + BASELINE + " combined detections/day. "
+    var prompt = "You are writing a plain-language read of a real satellite fire-detection count for a NASA Space Apps demo, for a fire manager (not a scientist). "
+      + "Region: Kazakhstan (country-wide bounding box). Date: September " + day + ", 2026. "
+      + "Real MODIS detections (NASA FIRMS): " + rec.m + ". Real VIIRS NOAA-20 detections: " + rec.v + ". "
+      + "This month's own median daily total (used as a baseline proxy, not a multi-year climatology): " + BASELINE + ". "
       + "Anomaly tier: " + tierLabel(tier) + ". "
       + "Write exactly 1-2 sentences. No disclaimers, no markdown, no restating the raw numbers back verbatim.";
     sampleApi(prompt).then(function(res){

@@ -11,7 +11,7 @@ One file with everything: links, pitch, architecture, mentor prep. Everything be
 - **Fire Harmonizer Architecture** — two block diagrams: data pipeline (satellite → narrative) and request flow (who talks to whom): https://claude.ai/artifact/GTXE5hpJBJT8VVf31PXvD4
 - **Fire Harmonizer Prototype** — the visual demo: calendar colored by anomaly severity, MODIS-vs-VIIRS gap chart, 30-day trend, Claude narrative per day: https://claude.ai/artifact/4mLbtg7VCFqEqd3JJ58EED
 
-All four are currently **private** — share each from its own page's Share menu before showing them to teammates, mentors, or judges.
+The two Fire Harmonizer links are now **shared publicly** ("anyone with the link"). The Challenge Matrix and Offer Tracker stay private — internal planning docs, not for a general audience.
 
 ## Local project files
 - `/home/rahim/NASA Space App/server.js` — Express backend, `/api/brief` calls Claude server-side (key never exposed to the browser)
@@ -49,11 +49,17 @@ Questions on judge psychology (pick 4–5, keep it conversational):
 - Sun Nov 15: 10:00–12:00 mentor sessions · 15:00–19:00 presentations/judging (5 min/team) · 20:00 winners announced (Zoom)
 - Challenges list: https://www.spaceappschallenge.org/2026/challenges/
 
+## Pitch talking point — don't forget this for the final slides
+Suomi NPP (the original VIIRS satellite) was officially retired Nov 2, 2026 — NASA FIRMS emailed a notice about it. Our data pipeline is built against **NOAA-20 / NOAA-21 VIIRS**, not the retired Suomi NPP feed. If a judge who knows this space asks about data sourcing: *"We're aware Suomi NPP was retired this month and built against NOAA-20/21 instead"* — shows real homework, not a copy-pasted API call. Small point, real credibility.
+
+## The data is now real — say this in the pitch
+All MODIS/VIIRS detection counts in the prototype are **real NASA FIRMS data** (MODIS NRT + VIIRS NOAA-20 NRT), pulled live with a personal API key for September 2026 over a bounding box covering all of Kazakhstan. The real peak is **Sept 6–8** (not the 14th we'd guessed before getting the key) — 656 MODIS vs. 2,647 VIIRS detections on the worst day alone, which is itself a great live example of the sensor gap. One honest caveat to keep ready: the bounding box is country-wide, so this is Kazakhstan's *total* fire signal that week (wildfires + agricultural burning), not isolated to the one reported steppe-fire event — that event is part of the real spike, not identical to it. Baseline is this month's own median day (753), not a multi-year climatology (no time to pull years of history).
+
 ## Real ML model
-`ml/anomaly_model.py` — a real Isolation Forest (scikit-learn) fit against the 30-day dataset, run offline. Output is baked into the prototype as the "ML anomaly score" stat tile, cross-checked against the rule-based z-score tiers (they agree on the real event window). Honest framing if asked: proof of methodology on a 30-day illustrative series, not a production model trained on years of real FIRMS history — that's the obvious next step with more time.
+`ml/anomaly_model.py` — a real Isolation Forest (scikit-learn) fit against the real FIRMS data above. Output is baked into the prototype as the "ML anomaly score" stat tile, and it independently flags the same Sept 6–8 window as anomalous. Honest framing if asked: real model, real data, but a 30-day window — more history would make it stronger, not more "real."
 
 ## Real literature on the harmonization gap
-Saved in `RESEARCH.md` — a literature review with real citations. Headline facts: VIIRS detects 3–6x more fire pixels than MODIS depending on region (not the ~1.2x our demo uses — mention the real range if asked), and no universal correction factor exists in the literature, so our simple baseline+z-score approach is the honest choice, not a weak one. The brief's CSV-export requirement is now built into the prototype ("Download month as CSV").
+Saved in `RESEARCH.md` — a literature review with real citations. Headline facts: VIIRS detects 3–6x more fire pixels than MODIS depending on region (our real Sept 7 data shows ~4x, right in that published range), and no universal correction factor exists in the literature, so our simple baseline+ratio approach is the honest choice, not a weak one. The brief's CSV-export requirement is built into the prototype ("Download month as CSV").
 
 ## Sponsor offers — don't get charged
 Tracked live in the **Hackathon Offer Tracker** artifact above. Reminder: read the actual terms at the moment of each real signup (card requirement + trial length vary and weren't verified for this specific event), enter the real signup date, and cancel before the trial ends.
